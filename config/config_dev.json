@@ -1,0 +1,23 @@
+{
+	"RootUrl":     "http://localhost:8080",
+	"RedirectURL": "http://localhost:8080/oauth2callback",
+	
+	"CookieName"   : "sid",
+	"CookieSecret" : "secret123mindale",
+	
+	"OAuthProviders"  : {
+		
+		"Google" : {				
+			"ClientID":     "771352157779-47352au6riecafb9fq178sv3cnkomtd4.apps.googleusercontent.com",
+			"ClientSecret": "vroFDGRHK1xF21mOc5j4rFnK"			
+		},
+		"Facebook" : {
+		},
+		"Github" : {
+		},
+		"Twitter" : {
+		}
+		 
+	}
+           
+}

@@ -1,0 +1,66 @@
+application: vktopgroups
+#module: default
+version: v1
+runtime: go
+api_version: go1
+threadsafe: true
+#instance_class: F1
+
+#automatic_scaling:
+#  min_idle_instances: 1
+#  max_pending_latency: 1s
+
+
+default_expiration: "1s"
+
+
+skip_files:
+#- (.*/)?#.*#$
+- ^(.*/)?sync$
+#- ^(.*/)?.*~$
+#- ^(.*/)?.*\.py[co]$
+#- ^(.*/)?.*/RCS/.*$
+#- ^(.*/)?\..*$
+#- ^(.*/)?.*#
+#- ^(.*/)?.*.md
+#- ^(.*/)?.*.log
+#- ^(.*/)?.*Makefile
+#- ^(.*/)?.*LICENSE
+#- ^(.*/)?.*gitignore
+#- ^(.*/)?.*README
+#- ^(.*/)?.*COPYING
+#- ^(.*/)?.*marked
+#- ^(.*/)?.*pkg
+#- ^(.*/)?.*.a
+- ^(.*/)?polymer/bower_components/*
+
+
+handlers:
+
+- url: /favicon.ico
+  static_files: static/favicon.ico
+  upload:  static/favicon.ico
+
+
+- url: /polymer
+  static_dir: polymer  
+  application_readable: true
+
+#- url: /polymer/index.html
+#  static_files: polymer/index.html  
+#  upload:  polymer/index.html  
+#  application_readable: true
+
+
+- url: /.*
+  script: _go_app
+  secure: always    
+
+
+
+# Important! Even though there's a catch all routing above,
+# without these two lines it's not going to work.
+# Make sure you have this:
+- url: /_ah/spi/.*
+  script: _go_app
+  #secure: always    

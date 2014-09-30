@@ -1,0 +1,2 @@
+gsutil -m rsync -d -r bower_components gs://mindale/polymer/bower_components
+gsutil -m acl -R set public-read gs://mindale/polymer

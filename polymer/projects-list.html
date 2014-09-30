@@ -1,0 +1,128 @@
+
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-menu/core-menu.html">
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-item/core-item.html">
+
+
+
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-dialog/paper-dialog-transition.html">
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-icons/core-icons.html">
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-button/paper-button.html">
+
+
+
+<polymer-element name="projects-list" attributes="RootUrl api">
+	
+
+	<template>
+        <style>
+
+
+              paper-button{
+                background: #4285f4;
+                color: #fff;
+
+              }
+
+
+        </style>
+
+<!--
+        <google-api-loader-custom id="vktopgroups" name="vktopgroups" version="v1" appId="vktopgroups" RootUrl="{{RootUrl}}"
+          on-google-api-load="{{vkLoad}}">
+        </google-api-loader-custom> 
+-->
+
+
+
+		<core-menu valueattr="label" id="core_menu" theme="core-light-theme">
+
+            <template repeat={{Items}}>
+
+                <core-item id="core_item" icon="settings" label="{{name}}" horizontal center layout></core-item>
+
+            </template>
+      		
+        </core-menu>
+
+
+        <paper-button class="colored" label="Create New Project" on-tap={{openDialog}}></paper-button>
+
+
+
+          <paper-dialog id="createDialog" heading="Create new Project" transition="paper-dialog-transition-center">
+            
+
+            <paper-input id="createProjectName" label="Type new project name"></paper-input>
+            
+            <paper-button label="Create" on-tap={{createProject}} affirmative autofocus></paper-button>
+
+          </paper-dialog>
+
+
+
+    </template>
+
+    <script>
+
+         Polymer('projects-list', {
+            
+       
+            apiChanged: function () {
+
+                if (!this.api) {
+                    return false;
+                }
+
+                this.getList();
+            },
+
+
+            getList: function () {
+
+                var request = this.api.projects.list();
+                
+                request.execute(function (resp) {
+                
+                    this.Items = resp.Items;                    
+
+                }.bind(this));
+
+                
+            },
+                  
+
+            openDialog: function(){
+
+                this.$.createDialog.toggle();
+
+            },
+
+
+             createProject: function(){
+                
+                var new_name = this.$.createProjectName.value;
+
+                console.log("new Project: " + new_name);
+
+                var request = this.api.projects.create({"name": new_name});
+                  request.execute(function (resp) {
+
+                    console.log('Project created: '  + new_name);
+
+                    this.getList();
+
+                  }.bind(this));
+           
+
+              }
+
+
+
+          });
+
+    </script>
+
+</polymer-element>

@@ -1,0 +1,23 @@
+{
+	"RootUrl":     "https://vktopgroups.appspot.com",
+	"RedirectURL": "https://vktopgroups.appspot.com/oauth2callback",
+	
+	"CookieName"   : "sid",
+	"CookieSecret" : "secret123mindale",
+	
+	"OAuthProviders"  : {
+		
+		"Google" : {				
+			"ClientID":     "771352157779-k5c8atu0bqp0gu5gvksvtiupiqil6nhe.apps.googleusercontent.com",
+			"ClientSecret": "XxIIMo05FqtPsRmhcHNmpdgH"
+		},
+		"Facebook" : {
+		},
+		"Github" : {
+		},
+		"Twitter" : {
+		}
+		 
+	}
+           
+}
