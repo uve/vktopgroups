@@ -6,6 +6,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"appengine/user"
+	//"strconv"
 )
 
 const (
@@ -57,7 +58,8 @@ func (s *Project) timestamp() string {
 func (s *Project) put(c appengine.Context) (err error) {
 	key := s.key
 	if key == nil {
-		key = datastore.NewIncompleteKey(c, PROJECT_KIND, nil)
+		//key = datastore.NewIncompleteKey(c, PROJECT_KIND, nil)
+		key = datastore.NewKey(c, PROJECT_KIND, "", 0,  nil)
 	}
 	key, err = datastore.Put(c, key, s)
 	if err == nil {
@@ -81,14 +83,18 @@ func newProject(name string, u *user.User) *Project {
 // userId returns a string ID of the user u to be used as Player of Project.
 func getProject(c appengine.Context, id int64) (*Project, error){
 
-    k := datastore.NewKey(c, "Project", "", id, nil)
-    item := new(Project)
-    if err := datastore.Get(c, k, item); err != nil {
-        //http.Error(w, err.Error(), 500)
-        return nil, err
-    }
+	//key := datastore.NewKey(c, "Project", "", id, nil)
 
-	return item, nil
+	k := datastore.NewKey(c, "Project", "", id, nil)
+	e := new(Project)
+	if err := datastore.Get(c, k, e); err != nil {
+		//http.Error(w, err.Error(), 500)
+		return nil, err
+	}
+
+
+
+	return e, nil
 }
 
 
@@ -97,13 +103,14 @@ func getProject(c appengine.Context, id int64) (*Project, error){
 func getProjectKey(c appengine.Context, id int64) (*datastore.Key, error){
 
     key := datastore.NewKey(c, "Project", "", id, nil)
-    /*
-    item := new(Project)
-    if err := datastore.Get(c, key, item); err != nil {
-        //http.Error(w, err.Error(), 500)
-        return nil, err
-    }
-*/
+
+
+	var e2 Project
+	if err := datastore.Get(c, key, &e2); err != nil {
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil, err
+	}
+
 	return key, nil
 }
 

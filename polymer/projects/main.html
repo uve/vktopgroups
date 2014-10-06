@@ -26,7 +26,22 @@
 
 
         <div>{{project_id}}</div>
-       
+
+        <div>Custom queries</div>
+
+
+        <template repeat="{{Items}}">
+
+            <div class="project-item" value="{{id}}" layout horizonal center>
+
+                <core-icon icon="love"></core-icon>{{name}}
+
+            </div>
+
+
+        </template>
+
+
 
         <paper-button class="colored" label="Create New Query" on-tap={{openDialog}}></paper-button>
 
@@ -40,6 +55,8 @@
             <paper-button label="Create" on-tap={{create}} affirmative autofocus></paper-button>
 
           </paper-dialog>
+
+
 
 
 
@@ -59,9 +76,19 @@
                 this.getList();
             },
 
+             project_idChanged: function () {
+
+                 if (!this.api || !this.project_id) {
+                     return false;
+                 }
+
+                 this.getList();
+             },
+
 
             getList: function () {
 
+                console.log('Load custom list');
                 if (!this.project_id){
                     return false;
                 }

@@ -8,7 +8,7 @@ import (
 	//"time"
 
 	"github.com/crhym3/go-endpoints/endpoints"
-	
+
 )
 
 
@@ -27,7 +27,7 @@ type ResponseMsgCustom struct {
 }
 
 type ListRequestCustoms struct {
-	Limit      int     `json:"Limit"`
+	Limit      int     `json:"limit"`
 	Project_id int64   `json:"Project_id,string" endpoints:'required'`
 }
 
@@ -45,6 +45,7 @@ func (ttt *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, res
 	c.Infof("CustomsCreate Params:")
 	c.Infof("Name: %v", req.Name)
 	c.Infof("Project_id:%v", req.Project_id)
+
 
 	project_id, err := getProjectKey(c, req.Project_id)
 	if err != nil {
@@ -71,27 +72,14 @@ func (ttt *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, res
 
 	c := endpoints.NewContext(r)
 
+	project_id, _ := getProjectKey(c, req.Project_id)
 	/*
-	u, err := getCurrentUser(c)
 	if err != nil {
-		return err
+		return errz
 	}
 	*/
 
-	project_id, err := getProjectKey(c, req.Project_id)
-	if err != nil {
-		return err
-	}
-
-	c.Infof("Project key:  %v", project_id)
-
-
-	q := newCustomQuery(project_id)
-
-	if req.Limit <= 0 {
-		req.Limit = 10
-	}
-	results, err := fetchCustoms(c, q, req.Limit)
+	results, err := fetchCustoms(c, project_id, req.Limit)
 	if err != nil {
 		return err
 	}

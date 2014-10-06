@@ -215,21 +215,21 @@ func RegisterService() (*endpoints.RpcService, error) {
 
 	info := rpcService.MethodByName("ProjectsList").Info()
 	info.Path, info.HttpMethod, info.Name = "projects/list", "GET", "projects.list"
-	
+	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 	info = rpcService.MethodByName("ProjectsCreate").Info()
 	info.Path, info.HttpMethod, info.Name = "projects/create", "POST", "projects.create"
-
+	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 
 
 	info = rpcService.MethodByName("CustomsList").Info()
 	info.Path, info.HttpMethod, info.Name = "params/custom/list", "GET", "params.custom.list"
-	
+	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 	info = rpcService.MethodByName("CustomsCreate").Info()
 	info.Path, info.HttpMethod, info.Name = "params/custom/create", "POST", "params.custom.create"
-	
+	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 /*
 	info = rpcService.MethodByName("ProjectsInsert").Info()

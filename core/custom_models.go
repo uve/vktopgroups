@@ -19,7 +19,7 @@ type Custom struct {
 	
 	Name    string
 	Created time.Time	
-	Project_id *datastore.Key `datastore:"Project_id,noindex"`
+	Project_id *datastore.Key// `datastore:"Project_id,noindex"`
 }
 
 
@@ -43,7 +43,8 @@ func (s *Custom) timestamp() string {
 func (s *Custom) put(c appengine.Context) (err error) {
 	key := s.key
 	if key == nil {
-		key = datastore.NewIncompleteKey(c, CUSTOM_KIND, nil)
+		//key = datastore.NewIncompleteKey(c, CUSTOM_KIND, nil)
+		key = datastore.NewKey(c, CUSTOM_KIND, "", 0,  nil)
 	}
 	key, err = datastore.Put(c, key, s)
 	if err == nil {
@@ -66,24 +67,24 @@ func newCustom(name string, project_id *datastore.Key) *Custom {
 
 
 
-
-
-// newUserProjectQuery returns a Query which can be used to list all previous
-// games of a user.
-func newCustomQuery(project_id *datastore.Key) *datastore.Query {
-	return datastore.NewQuery(CUSTOM_KIND).Filter("Project_id =", project_id).Order("Created")
-}
-
 // fetchProjects runs Query q and returns Project entities fetched from the
 // Datastore.
-func fetchCustoms(c appengine.Context, q *datastore.Query, limit int) ([]*Custom, error) {
+func fetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]*Custom, error) {
+
+	if limit<= 0 {
+		limit = 10
+	}
+
+	q:= datastore.NewQuery(CUSTOM_KIND).Order("Created").Limit(limit).Filter("Project_id=", project_id)
 
 	results := make([]*Custom, 0, limit)
-	keys, err := q.Limit(limit).GetAll(c, &results)
+	keys, err := q.GetAll(c, &results)
 	if err != nil {
 		return nil, err
 	}
 	for i, item := range results {
+
+		//c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
 		item.key = keys[i]
 	}
 	return results, nil
