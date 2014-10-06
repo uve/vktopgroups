@@ -10,6 +10,27 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: Custom
+  properties:
+  - name: Project_id
+  - name: Created
+
+- kind: Custom
+  properties:
+  - name: project_id
+  - name: Created
+
+- kind: Project
+  properties:
+  - name: User
+  - name: Created
+
+- kind: Project
+  properties:
+  - name: User
+  - name: Created
+    direction: desc
+
 - kind: User
   properties:
   - name: Id

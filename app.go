@@ -51,14 +51,14 @@ func oauth2callback(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+
 func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
 	params := Params{
 		ClientId: core.ClientId,
 		RootUrl: core.RootUrl,
 	}
-
-
 		
 
 	var index = template.Must(template.ParseFiles("polymer/index.html"))

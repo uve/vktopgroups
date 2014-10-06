@@ -1,7 +1,7 @@
 package core
 
 import (
-	//"time"
+	"time"
 
 	"appengine"
 	"appengine/datastore"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	TIME_LAYOUT = "Jan 2, 2006 15:04:05 AM"
+	TIME_LAYOUT = "02.01Jan 2, 2006 15:04:05 AM"
 	PROJECT_KIND  = "Project"
 )
 
@@ -24,6 +24,7 @@ type Project struct {
 */
 	User    string
 	Name    string
+	Created time.Time
 }
 
 
@@ -39,6 +40,8 @@ func (s *Project) toMessage(msg *ProjectRespMsg) *ProjectRespMsg {
 	}
 	msg.Id = s.key.IntID()
 	msg.Name = s.Name
+	//msg.Created = s.timestamp()
+
 	//msg.Outcome = s.Outcome
 	//msg.Played = s.timestamp()
 	return msg
@@ -47,8 +50,7 @@ func (s *Project) toMessage(msg *ProjectRespMsg) *ProjectRespMsg {
 
 // timestamp formats date/time of the project.
 func (s *Project) timestamp() string {
-	//return s.Played.Format(TIME_LAYOUT)
-	return ""
+	return s.Created.Format(TIME_LAYOUT)	
 }
 
 // put stores the project in the Datastore.
@@ -69,15 +71,49 @@ func newProject(name string, u *user.User) *Project {
 	//return &Project{Outcome: outcome, Played: time.Now(), Player: userId(u)}
 	return &Project{
 				Name: name,
-				User: userId(u) }
+				User: userId(u),
+				Created: time.Now(),
+	}
 }
+
+
+
+// userId returns a string ID of the user u to be used as Player of Project.
+func getProject(c appengine.Context, id int64) (*Project, error){
+
+    k := datastore.NewKey(c, "Project", "", id, nil)
+    item := new(Project)
+    if err := datastore.Get(c, k, item); err != nil {
+        //http.Error(w, err.Error(), 500)
+        return nil, err
+    }
+
+	return item, nil
+}
+
+
+
+// userId returns a string ID of the user u to be used as Player of Project.
+func getProjectKey(c appengine.Context, id int64) (*datastore.Key, error){
+
+    key := datastore.NewKey(c, "Project", "", id, nil)
+    /*
+    item := new(Project)
+    if err := datastore.Get(c, key, item); err != nil {
+        //http.Error(w, err.Error(), 500)
+        return nil, err
+    }
+*/
+	return key, nil
+}
+
 
 
 
 // newUserProjectQuery returns a Query which can be used to list all previous
 // games of a user.
 func newUserProjectQuery(u *user.User) *datastore.Query {
-	return datastore.NewQuery(PROJECT_KIND).Filter("User =", userId(u))
+	return datastore.NewQuery(PROJECT_KIND).Filter("User =", userId(u)).Order("Created")
 }
 
 // fetchProjects runs Query q and returns Project entities fetched from the

@@ -41,6 +41,7 @@ type ProjectReqMsg struct {
 type ProjectRespMsg struct {
 	Id      int64  `json:"id"`
 	Name    string `json:"name"`
+	//Created string `json:"created"`
 	/*Outcome string `json:"outcome"`
 	Played  string `json:"played"`*/
 }
@@ -136,6 +137,8 @@ func (ttt *ServiceApi) ProjectsCreate(r *http.Request,
 
 
 
+
+
 // ProjectsList queries scores for the current user.
 // Exposed as API endpoint
 func (ttt *ServiceApi) ProjectsList(r *http.Request,
@@ -211,13 +214,22 @@ func RegisterService() (*endpoints.RpcService, error) {
 
 
 	info := rpcService.MethodByName("ProjectsList").Info()
-	info.Path, info.HttpMethod, info.Name, info.Desc  = "projects", "GET", "projects.list", "Show all projects"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
+	info.Path, info.HttpMethod, info.Name = "projects/list", "GET", "projects.list"
+	
 
 	info = rpcService.MethodByName("ProjectsCreate").Info()
-	info.Path, info.HttpMethod, info.Name = "scores", "POST", "projects.create"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+	info.Path, info.HttpMethod, info.Name = "projects/create", "POST", "projects.create"
+
+
+
+
+	info = rpcService.MethodByName("CustomsList").Info()
+	info.Path, info.HttpMethod, info.Name = "params/custom/list", "GET", "params.custom.list"
+	
+
+	info = rpcService.MethodByName("CustomsCreate").Info()
+	info.Path, info.HttpMethod, info.Name = "params/custom/create", "POST", "params.custom.create"
+	
 
 /*
 	info = rpcService.MethodByName("ProjectsInsert").Info()
