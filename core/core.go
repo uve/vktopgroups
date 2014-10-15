@@ -29,13 +29,13 @@ var (
 )
 
 type BoardMsg struct {
-	State string "json:'state' endpoints:'required'"
+	State string `json:"state" endpoints:"required"`
 }
 
 
 
 type ProjectReqMsg struct {
-	Name string "json:'name' endpoints:'required'"
+	Name string `json:"name" endpoints:"required"`
 }
 
 type ProjectRespMsg struct {
@@ -47,11 +47,11 @@ type ProjectRespMsg struct {
 }
 
 type ProjectsListReq struct {
-	Limit int "json:'limit'"
+	Limit int `json:"limit"`
 }
 
 type ProjectsListResp struct {
-	Items []*ProjectRespMsg "json:'items'"
+	Items []*ProjectRespMsg `json:"items"`
 }
 
 // Mindale API service
@@ -131,6 +131,7 @@ func (ttt *ServiceApi) ProjectsCreate(r *http.Request,
 		return err
 	}
 	project.toMessage(resp)
+
 	return nil
 }
 
@@ -230,6 +231,13 @@ func RegisterService() (*endpoints.RpcService, error) {
 	info = rpcService.MethodByName("CustomsCreate").Info()
 	info.Path, info.HttpMethod, info.Name = "params/custom/create", "POST", "params.custom.create"
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+
+
+
+	info = rpcService.MethodByName("GroupsList").Info()
+	info.Path, info.HttpMethod, info.Name = "groups/list", "GET", "groups.list"
+	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+
 
 /*
 	info = rpcService.MethodByName("ProjectsInsert").Info()

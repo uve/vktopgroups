@@ -15,7 +15,7 @@
   <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-menu/core-submenu.html">
 
 
-  <link rel="import" href="/polymer/projects/list.html">
+  <link rel="import" href="/polymer/projects/projects-list.html">
   <link rel="import" href="/polymer/projects/main.html">
 
   
@@ -41,7 +41,7 @@
           </style>
           <core-scaffold id="core_scaffold">
               <core-header-panel mode="seamed" id="core_header_panel" navigation flex>
-                  <core-toolbar id="core_toolbar"></core-toolbar>
+                  <core-toolbar id="core_toolbar"><a target="_blank" href="/_ah/api/explorer">/_ah/api/explorer</a></core-toolbar>
                   
 
                   <projects-list api="{{api}}" project_id="{{project_id}}"></projects-list>
@@ -62,6 +62,7 @@
               <template if="{{project_id}}">
 
                 <projects-main fit api="{{api}}" project_id="{{project_id}}"> </projects-main>
+
 
               </template>
 

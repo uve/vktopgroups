@@ -48,9 +48,16 @@ type OAuthProviders struct{
 	
 }
 
+type VK struct{
+
+	ApiVersion    string
+	Token         string
+	AppId         string
+}
+
 
 var Config = struct {
-
+	VK VK
 	
 	CookieName string
 	CookieSecret string

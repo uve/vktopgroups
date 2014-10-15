@@ -41,16 +41,18 @@ func (s *Custom) timestamp() string {
 
 
 func (s *Custom) put(c appengine.Context) (err error) {
+
 	key := s.key
 	if key == nil {
-		//key = datastore.NewIncompleteKey(c, CUSTOM_KIND, nil)
 		key = datastore.NewKey(c, CUSTOM_KIND, "", 0,  nil)
 	}
 	key, err = datastore.Put(c, key, s)
-	if err == nil {
-		s.key = key
+	if err != nil {
+		return err
 	}
-	return
+	s.key = key
+	
+	return nil
 }
 
 // newProject returns a new Project ready to be stored in the Datastore.
@@ -82,11 +84,13 @@ func fetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]
 	if err != nil {
 		return nil, err
 	}
+
 	for i, item := range results {
 
 		//c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
 		item.key = keys[i]
 	}
+
 	return results, nil
 }
 

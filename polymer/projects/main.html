@@ -8,6 +8,7 @@
 <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-button/paper-button.html">
 
 
+<link rel="import" href="/polymer/projects/group.html">
 
 <polymer-element name="projects-main" attributes="api project_id">
 	
@@ -30,14 +31,13 @@
         <div>Custom queries</div>
 
 
-        <template repeat="{{Items}}">
+        <template repeat="{{items}}">
 
             <div class="project-item" value="{{id}}" layout horizonal center>
 
                 <core-icon icon="love"></core-icon>{{name}}
 
             </div>
-
 
         </template>
 
@@ -58,6 +58,8 @@
 
 
 
+        <projects-group api="{{api}}" project_id="{{project_id}}"> </projects-group>
+
 
 
     </template>
@@ -66,16 +68,6 @@
 
          Polymer({
             
-       
-            apiChanged: function () {
-
-                if (!this.api) {
-                    return false;
-                }
-
-                this.getList();
-            },
-
              project_idChanged: function () {
 
                  if (!this.api || !this.project_id) {
@@ -93,15 +85,15 @@
                     return false;
                 }
 
-                var request = this.api.params.custom.list({"Project_id": this.project_id.toString(), "Limit": 1000});
-                
+                var request = this.api.params.custom.list({"project_id": this.project_id.toString(), "limit": 1000});
+
                 request.execute(function (resp) {
-                
-                    this.Items = resp.Items;                    
+
+                    this.items = resp.items;
 
                 }.bind(this));
 
-                
+
             },
                   
 
@@ -115,21 +107,18 @@
 
 
              create: function(){
-                
+
                 var new_name = this.$.createText.value;
 
-                console.log("new Custom: " + new_name);
-
-                var request = this.api.params.custom.create({"Name": new_name, "Project_id": this.project_id.toString() });
+                var request = this.api.params.custom.create({"name": new_name, "project_id": this.project_id.toString() });
 
                   request.execute(function (resp) {
 
-                    console.log('Custom created: '  + new_name);
 
                     this.getList();
 
                   }.bind(this));
-           
+
 
               }
 

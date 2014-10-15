@@ -49,7 +49,7 @@
 
         <core-selector valueattr="value" selected="{{project_id}}">
 
-               <template repeat="{{Items}}">
+               <template repeat="{{items}}">
 
                         <div class="project-item" value="{{id}}" layout horizonal center>
 
@@ -103,10 +103,10 @@
                 
                 request.execute(function (resp) {
                 
-                    this.Items = resp.Items;  
+                    this.items = resp.items;  
 
-                    if ( this.Items.length > 0 ) {
-                        this.project_id = this.Items[0].id;
+                    if ( this.items.length > 0 ) {
+                        this.project_id = this.items[0].id;
                     }             
 
                 }.bind(this));

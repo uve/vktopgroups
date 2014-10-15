@@ -18,6 +18,12 @@
 		"Twitter" : {
 		}
 		 
-	}
+	},
+
+    "VK":   {
+        "ApiVersion" : "5.21",
+        "Token" : "ce98512ea77024fc2547dcae0440fca3b94eb0acfa163b5a0015174735f9fa14be5af2d8f7126458941d2",
+        "AppId" : "1184396"
+    }
            
 }

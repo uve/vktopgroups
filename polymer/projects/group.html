@@ -1,0 +1,73 @@
+
+
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-icons/core-icons.html">
+<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-button/paper-button.html">
+
+
+
+<polymer-element name="projects-group" attributes="api project_id">
+	
+
+	<template>
+        <style>
+
+
+              paper-button{
+                background: #4285f4;
+                color: #green;
+
+              }
+             
+        </style>
+
+
+        <div>{{project_id}}</div>
+
+        <div>Custom queries</div>
+
+
+        <paper-button class="colored" label="Fetch Groups" on-tap={{getList}}></paper-button>
+
+
+    </template>
+
+    <script>
+
+         Polymer({
+            
+             project_idChanged: function () {
+
+                 if (!this.api || !this.project_id) {
+                     return false;
+                 }
+
+                 //this.getList();
+             },
+
+
+            getList: function () {
+
+
+                if (!this.project_id){
+                    return false;
+                }
+
+                var request = this.api.groups.list({"project_id": this.project_id.toString(), "limit": 1000});
+
+                request.execute(function (resp) {
+
+                    //this.items = resp.items;
+
+                }.bind(this));
+
+
+            }
+                  
+
+
+
+          });
+
+    </script>
+
+</polymer-element>
