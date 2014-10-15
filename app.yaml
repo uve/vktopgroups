@@ -43,12 +43,12 @@ handlers:
 
 
 - url: /polymer
-  static_dir: polymer  
+  static_dir: polymer
   application_readable: true
 
 #- url: /polymer/index.html
-#  static_files: polymer/index.html  
-#  upload:  polymer/index.html  
+#  static_files: polymer/index.html
+#  upload:  polymer/index.html
 #  application_readable: true
 
 

@@ -31,7 +31,6 @@ type Project struct {
 
 
 
-
 // Turns the Project struct/entity into a ProjectRespMsg which is then used
 // as an API response.
 
