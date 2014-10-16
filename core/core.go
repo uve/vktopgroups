@@ -36,7 +36,7 @@ type ServiceApi struct {
 /*
 // BoardGetMove simulates a computer move in mindale.
 // Exposed as API endpoint
-func (ttt *ServiceApi) BoardGetMove(r *http.Request,
+func (api *ServiceApi) BoardGetMove(r *http.Request,
 	req *BoardMsg, resp *BoardMsg) error {
 
 	const boardLen = 9
@@ -67,7 +67,7 @@ func (ttt *ServiceApi) BoardGetMove(r *http.Request,
 
 // ProjectsList queries scores for the current user.
 // Exposed as API endpoint
-func (ttt *ServiceApi) ProjectsList(r *http.Request,
+func (api *ServiceApi) ProjectsList(r *http.Request,
 	req *ProjectsListReq, resp *ProjectsListResp) error {
 
 	c := endpoints.NewContext(r)

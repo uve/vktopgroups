@@ -17,25 +17,34 @@
         <style>
 
 
-              paper-button{
-                background: #4285f4;
-                color: #fff;
+          paper-button{
 
-              }
+              background: #4285f4;
+              color: #fff;
+
+              margin: 30px;
+          }
+
+            .search-item{
+                cursor: pointer;
+            }
+
+
+            .groups {
+                margin: 50px;
+            }
              
         </style>
 
 
-        <div>{{project_id}}</div>
-
-        <div>Custom queries</div>
+        <h3>Запросы:</h3>
 
 
         <template repeat="{{items}}">
 
-            <div class="project-item" value="{{id}}" layout horizonal center>
+            <div layout horizonal center class="search-item" value="{{id}}" on-tap="{{search}}">
 
-                <core-icon icon="love"></core-icon>{{name}}
+                <core-icon icon="search"></core-icon>{{name}}
 
             </div>
 
@@ -60,6 +69,21 @@
 
         <projects-group api="{{api}}" project_id="{{project_id}}"> </projects-group>
 
+
+
+        <div class="groups" layout horizonal center>
+        <template repeat="{{groups}}">
+
+            <div class="group-item" value="{{id}}" layout horizonal center>
+
+                <div>{{name}}</div>
+                <div>{{members_count}}</div>
+
+            </div>
+
+
+        </template>
+        </div>
 
 
     </template>
@@ -120,7 +144,20 @@
                   }.bind(this));
 
 
-              }
+              },
+
+             search: function (event) {
+
+                 var custom_id = event.target.getAttribute("value");
+
+                 var request = this.api.groups.list({"custom_id": custom_id, "limit": 1000});
+
+                 request.execute(function (resp) {
+
+                     this.groups = resp.items;
+
+                 }.bind(this));
+             }
 
 
 

@@ -119,7 +119,7 @@ func getProjectKey(c appengine.Context, id int64) (*datastore.Key, error){
 // newUserProjectQuery returns a Query which can be used to list all previous
 // games of a user.
 func newUserProjectQuery(u *user.User) *datastore.Query {
-	return datastore.NewQuery(PROJECT_KIND).Filter("User =", userId(u)).Order("Created")
+	return datastore.NewQuery(PROJECT_KIND).Filter("User =", userId(u)).Order("-Created")
 }
 
 // fetchProjects runs Query q and returns Project entities fetched from the

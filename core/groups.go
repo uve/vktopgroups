@@ -2,6 +2,7 @@ package core
 
 import (
 	"net/http"
+	"net/url"
 
 
 	"fmt"
@@ -13,6 +14,8 @@ import (
 
 
 	"encoding/json"
+
+
 )
 
 
@@ -31,52 +34,80 @@ type GroupRespMsg struct {
 }
 
 type GroupsListReq struct {
-	Limit int `json:"limit"`
-}
+	Limit 	   int    `json:"limit"`
+	Custom_id  int64  `json:"custom_id,string" endpoints:'required'`
 
-type GroupsListResp struct {
-	//Items []*GroupRespMsg `json:"items"`
-	Items []Response `json:"items"`
 }
 
 
-type Response struct {
+
+type UserResponse struct {
 	Id		   int `json:"id"`
 	First_name string `json:"first_name"`
 	Last_name  string `json:"last_name"`
 	Photo      string `json:"photo"`
 }
 
+
+type GroupsListResp struct {
+
+	Items []Group `json:"items"`
+}
+
+
+
+
+
+
+/*
+type GroupsResponse struct {
+	Group
+}
+*/
 type Message struct {
 
-	Response []Response `json:"response"`
+	Response []Group `json:"response"`
 
 }
 
 
 // GroupsList queries scores for the current user.
 // Exposed as API endpoint
-func (ttt *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, results *GroupsListResp) error {
+func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, results *GroupsListResp) error {
 
 
 	c := endpoints.NewContext(r)
 	client := urlfetch.Client(c)
 
 
-	api    := ApiVersion
 	server := "https://api.vk.com/method"
+
+
+	custom, _ := getCustom(c, req.Custom_id)
+
+	c.Infof("Seach id: %v", req.Custom_id)
+	c.Infof("Seach query: %v", custom.Name)
+
+	/*
 	method := "users.get"
 	parameters := "user_ids=1184396&fields=photo"
-	access_token := Token
-	//AppId
+	*/
+
+	method := "execute.scan_groups"
 
 
-	url := fmt.Sprintf("%s/%s?access_token=%s&v=%s&%s", server, method, access_token, api, parameters)
+	v := url.Values{}
+	v.Set("access_token", Token)
+	v.Add("limit", "3")
 
-	c.Infof("URL: %v", url)
+	v.Add("v", ApiVersion)
+	v.Add("q", custom.Name)
 
 
-	resp, err := client.Get(url)
+	api_url := fmt.Sprintf("%s/%s?%s", server, method, v.Encode())
+
+
+	resp, err := client.Get(api_url)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
 		return nil
@@ -91,47 +122,36 @@ func (ttt *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, results *
 
 
 
+
+	/*
 	for i := 0; i < len(m.Response); i++ {
 
 		user := m.Response[i];
 
-		c.Infof("New user!!!")
-		c.Infof("Id: %v", user.Id)
+		c.Infof("New response!!!")
 
+		c.Infof("Id: %v", user.Id)
 		c.Infof("First_name: %v", user.First_name)
 		c.Infof("Last_name: %v", user.Last_name)
 		c.Infof("Photo: %v", user.Photo)
 
+		c.Infof("Id: %v", user.Id)
+		c.Infof("Name: %v", user.Name)
+		c.Infof("Members_count: %v", user.Members_count)
+
 	}
+	*/
+
+	c.Infof("Values from vk: %v", len(m.Response))
+
+	cnt,_ := putMulti(c, &m.Response)
+
+
+	c.Infof("Values created: %v", cnt)
+
 
 	results.Items = m.Response
 
-
-
-	//results.Body = body
-	//fmt.Fprintf(w, "HTTP GET returned status %v", resp.Status)
-
-
-	/*
-	c := endpoints. NewContext(r)
-	u, err := getCurrentUser(c)
-	if err != nil {
-		return err
-	}
-	q := newUserGroupQuery(u)
-	if req.Limit <= 0 {
-		req.Limit = 10
-	}
-	results, err := fetchGroups(c, q, req.Limit)
-	if err != nil {
-		return err
-	}
-
-	resp.Items = make([]*GroupRespMsg, len(results))
-	for i, item := range results {
-		resp.Items[i] = item.toMessage(nil)
-	}
-	*/
 	return nil
 }
 

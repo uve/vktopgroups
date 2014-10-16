@@ -29,7 +29,7 @@ type ProjectsListResp struct {
 
 
 // ProjectsInsert inserts a new score for the current user.
-func (ttt *ServiceApi) ProjectsCreate(r *http.Request,
+func (api *ServiceApi) ProjectsCreate(r *http.Request,
 	req *ProjectReqMsg, resp *ProjectRespMsg) error {
 
 	c := endpoints.NewContext(r)
@@ -51,7 +51,7 @@ func (ttt *ServiceApi) ProjectsCreate(r *http.Request,
 
 // ProjectsList queries scores for the current user.
 // Exposed as API endpoint
-func (ttt *ServiceApi) ProjectsList(r *http.Request,
+func (api *ServiceApi) ProjectsList(r *http.Request,
 	req *ProjectsListReq, resp *ProjectsListResp) error {
 
 	c := endpoints.NewContext(r)

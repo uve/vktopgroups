@@ -39,7 +39,7 @@ type ListResponseCustoms struct {
 
 
 
-func (ttt *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, resp *ResponseMsgCustom) error {
+func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, resp *ResponseMsgCustom) error {
 
 	c := endpoints.NewContext(r)
 
@@ -61,7 +61,7 @@ func (ttt *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, res
 
 
 
-func (ttt *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, resp *ListResponseCustoms) error {
+func (api *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, resp *ListResponseCustoms) error {
 
 	c := endpoints.NewContext(r)
 

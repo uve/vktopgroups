@@ -77,7 +77,7 @@ func fetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]
 		limit = 10
 	}
 
-	q:= datastore.NewQuery(CUSTOM_KIND).Order("Created").Limit(limit).Filter("Project_id=", project_id)
+	q:= datastore.NewQuery(CUSTOM_KIND).Order("-Created").Limit(limit).Filter("Project_id=", project_id)
 
 	results := make([]*Custom, 0, limit)
 	keys, err := q.GetAll(c, &results)

@@ -105,7 +105,7 @@
                 
                     this.items = resp.items;  
 
-                    if ( this.items.length > 0 ) {
+                    if ( this.items && this.items.length > 0 ) {
                         this.project_id = this.items[0].id;
                     }             
 
