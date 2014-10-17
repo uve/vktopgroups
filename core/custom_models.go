@@ -94,3 +94,16 @@ func fetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]
 	return results, nil
 }
 
+
+
+func getCustom(c appengine.Context, id int64) (*datastore.Key, *Custom, error){
+
+	k := datastore.NewKey(c, "Custom", "", id, nil)
+	e := new(Custom)
+	if err := datastore.Get(c, k, e); err != nil {
+		//http.Error(w, err.Error(), 500)
+		return nil, nil, err
+	}
+
+	return k, e, nil
+}

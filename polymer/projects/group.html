@@ -14,8 +14,9 @@
 
               paper-button{
                 background: #4285f4;
-                color: #green;
+                color: white;
 
+                 margin: 20px;
               }
              
         </style>
@@ -24,11 +25,26 @@
         <div>Запросы</div>
 
 
-        <paper-button class="colored" label="Обновить список" on-tap={{getList}}></paper-button>
 
 
+        <div class="groups" layout horizonal center>
+
+            <template repeat="{{items}}">
+
+                <div class="group-item" value="{{id}}" layout horizonal center>
+
+                    <div>{{name}}</div>
+                    <div>{{members_count}}</div>
+
+                </div>
 
 
+            </template>
+
+        </div>
+
+        <paper-button class="colored" label="get List" on-tap={{getList}}></paper-button>
+        <paper-button class="colored" label="fetch List" on-tap={{fetchList}}></paper-button>
 
 
     </template>
@@ -53,20 +69,38 @@
                     return false;
                 }
 
-                var request = this.api.groups.list({"project_id": this.project_id.toString(), "limit": 1000});
+                this.api.groups.list({
+                    "project_id": this.project_id.toString(),
+                    "limit": 1000
 
-                request.execute(function (resp) {
+                }).then(function(resp) {
 
-                    this.items = resp.items;
+                        this.items = resp.result.items;
 
-                }.bind(this));
+                }.bind(this),
+                function(err) {
+                    this.items = [];
+                });
 
-            }
-                  
+            },
 
 
+             fetchList: function () {
 
-          });
+                 this.api.groups.fetch({
+                     "custom_id": "5118776383111168",
+                     "limit": 1000
+
+                 }).then(function (resp) {
+
+                 }.bind(this),
+                 function (err) {
+
+                 });
+
+             }
+
+         });
 
     </script>
 

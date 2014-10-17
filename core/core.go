@@ -12,16 +12,22 @@ import (
 )
 
 
-var ClientId = config.Config.OAuthProviders.Google.ClientID
-var RootUrl  = config.Config.RootUrl
-
-
 var (
 	scopes    = []string{endpoints.EmailScope}
 	clientIds = []string{ClientId, endpoints.ApiExplorerClientId}
 	// in case we'll want to use Mindale API from an Android app
 	audiences = []string{ClientId}
+
+
+
+
+
+	VK = config.Config.VK
+
+	ClientId = config.Config.OAuthProviders.Google.ClientID
+	RootUrl  = config.Config.RootUrl
 )
+
 
 type BoardMsg struct {
 	State string `json:"state" endpoints:"required"`
@@ -160,6 +166,11 @@ func RegisterService() (*endpoints.RpcService, error) {
 
 	info = rpcService.MethodByName("GroupsList").Info()
 	info.Path, info.HttpMethod, info.Name = "groups/list", "GET", "groups.list"
+	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+
+
+	info = rpcService.MethodByName("GroupsFetch").Info()
+	info.Path, info.HttpMethod, info.Name = "groups/fetch", "POST", "groups.fetch"
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 

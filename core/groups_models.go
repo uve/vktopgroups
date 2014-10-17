@@ -6,6 +6,10 @@ import (
 )
 
 
+const (
+
+	GROUP_KIND  = "Group"
+)
 
 
 type Contacts struct {
@@ -15,62 +19,107 @@ type Contacts struct {
 }
 
 
-type Group struct {
-	Id		       int    `json:"id"`
+
+type GroupBase struct {
+
+	VK_id	       int64  `json:"id"`
+
 	Name 		   string `json:"name"`
 	Screen_name	   string `json:"screen_name"`
 
 	Is_closed	   int    `json:"is_closed"`
 	Type		   string `json:"type"`
 
-	Members_count  int    `json:"members_count"`
-
-	Contacts 	   []Contacts `json:"contacts"`
-
+	Members_count  int64  `json:"members_count"`
 
 	Site		   string `json:"site"`
 	Photo_50	   string `json:"photo_50"`
 	Photo_100	   string `json:"photo_100"`
 	Photo_200	   string `json:"photo_200"`
-
 }
 
 
-func getCustom(c appengine.Context, id int64) (*Custom, error){
+type Group struct {
 
-	k := datastore.NewKey(c, "Custom", "", id, nil)
-	e := new(Custom)
-	if err := datastore.Get(c, k, e); err != nil {
-		//http.Error(w, err.Error(), 500)
-		return nil, err
+	GroupBase
+
+	key 		   *datastore.Key
+
+	Project_id     *datastore.Key// `datastore:"Project_id,noindex"`
+	Custom_id      *datastore.Key// `datastore:"Custom_id,noindex"`
+}
+
+
+
+type GroupJson struct {
+
+	GroupBase
+
+	Id      	   int64  	  `json:"id"`
+
+	Contacts 	   []Contacts `json:"contacts"`
+}
+
+
+
+func (s *Group) toMessage(msg *GroupJson) *GroupJson {
+	if msg == nil {
+		msg = &GroupJson{}
 	}
+	msg.Id = s.key.IntID()
+	msg.Name = s.Name
+	msg.Members_count = s.Members_count
 
-
-	return e, nil
+	return msg
 }
 
 
-func putMulti(c appengine.Context, s *[]Group) (int, error){
 
-	// A batch put.
-	//_, err := datastore.PutMulti(c, []*datastore.Key{k1, k2, k3}, []interface{}{e1, e2, e3})
 
+func putMulti(c appengine.Context, s *[]Group) (error){
 
 	keys := make([]*datastore.Key, len(*s))
-	//rs := make([]*Record, len(emails))
 
 	for i := 0; i < len(*s); i++ {
 		keys[i] = datastore.NewKey(c, "Group", "", 0, nil)
 	}
 
-	ks, err := datastore.PutMulti(c, keys, *s)
+	_, err := datastore.PutMulti(c, keys, *s)
+
 	if err != nil {
-		return 0, nil
+		return err
 	}
 
-	return len(ks), nil
-
+	return nil
 
 }
+
+
+
+func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*Group, error) {
+
+	if limit<= 0 {
+		limit = 10
+	}
+
+	q:= datastore.NewQuery(GROUP_KIND).Order("-Members_count").Limit(limit).Filter("Project_id=", project_id)
+
+	results := make([]*Group, 0, limit)
+	keys, err := q.GetAll(c, &results)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, item := range results {
+
+		//c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
+		item.key = keys[i]
+	}
+
+	return results, nil
+}
+
+
+
 
 

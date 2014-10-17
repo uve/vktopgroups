@@ -103,7 +103,6 @@ func getProjectKey(c appengine.Context, id int64) (*datastore.Key, error){
 
     key := datastore.NewKey(c, "Project", "", id, nil)
 
-
 	var e2 Project
 	if err := datastore.Get(c, key, &e2); err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)

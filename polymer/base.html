@@ -16,7 +16,7 @@
 
 
   <link rel="import" href="/polymer/projects/projects-list.html">
-  <link rel="import" href="/polymer/projects/main.html">
+  <link rel="import" href="/polymer/projects/params-custom.html">
 
   
   <link rel="import" href="/polymer/google-signin-status.html">
@@ -59,12 +59,17 @@
               </div>
 
 
-              <template if="{{project_id}}">
+              <div layout vertical>
 
-                <projects-main fit api="{{api}}" project_id="{{project_id}}"> </projects-main>
+                  <template if="{{project_id}}">
 
+                    <params-custom api="{{api}}" project_id="{{project_id}}"> </params-custom>
 
-              </template>
+                    <projects-group api="{{api}}" project_id="{{project_id}}"> </projects-group>
+
+                  </template>
+
+              </div>
 
 
           </core-scaffold>

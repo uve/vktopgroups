@@ -10,7 +10,7 @@
 
 <link rel="import" href="/polymer/projects/group.html">
 
-<polymer-element name="projects-main" attributes="api project_id">
+<polymer-element name="params-custom" attributes="api project_id">
 	
 
 	<template>
@@ -67,23 +67,8 @@
 
 
 
-        <projects-group api="{{api}}" project_id="{{project_id}}"> </projects-group>
 
 
-
-        <div class="groups" layout horizonal center>
-        <template repeat="{{groups}}">
-
-            <div class="group-item" value="{{id}}" layout horizonal center>
-
-                <div>{{name}}</div>
-                <div>{{members_count}}</div>
-
-            </div>
-
-
-        </template>
-        </div>
 
 
     </template>
@@ -109,13 +94,20 @@
                     return false;
                 }
 
-                var request = this.api.params.custom.list({"project_id": this.project_id.toString(), "limit": 1000});
 
-                request.execute(function (resp) {
+                this.api.params.custom.list({
+                    "project_id": this.project_id.toString(),
+                    "limit": 1000
 
-                    this.items = resp.items;
+                }).then(function(resp) {
 
-                }.bind(this));
+                    this.items = resp.result.items;
+
+                }.bind(this),
+                function(err) {
+                    this.items = [];
+                });
+
 
 
             },
@@ -146,17 +138,8 @@
 
               },
 
-             search: function (event) {
+             search: function(){
 
-                 var custom_id = event.target.getAttribute("value");
-
-                 var request = this.api.groups.list({"custom_id": custom_id, "limit": 1000});
-
-                 request.execute(function (resp) {
-
-                     this.groups = resp.items;
-
-                 }.bind(this));
              }
 
 
