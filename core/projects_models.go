@@ -98,6 +98,23 @@ func getProject(c appengine.Context, id int64) (*Project, error){
 
 
 
+func getItemById(c appengine.Context, id int64) (*Project, error){
+
+	//key := datastore.NewKey(c, "Project", "", id, nil)
+
+	k := datastore.NewKey(c, "Project", "", id, nil)
+	e := new(Project)
+	if err := datastore.Get(c, k, e); err != nil {
+		//http.Error(w, err.Error(), 500)
+		return nil, err
+	}
+
+
+
+	return e, nil
+}
+
+
 // userId returns a string ID of the user u to be used as Player of Project.
 func getProjectKey(c appengine.Context, id int64) (*datastore.Key, error){
 
@@ -111,6 +128,21 @@ func getProjectKey(c appengine.Context, id int64) (*datastore.Key, error){
 
 	return key, nil
 }
+
+
+func getKey(c appengine.Context, kind_name string, id int64) (*datastore.Key, error){
+
+	key := datastore.NewKey(c, kind_name, "", id, nil)
+
+	var e2 Project
+	if err := datastore.Get(c, key, &e2); err != nil {
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return key, nil
+}
+
 
 
 

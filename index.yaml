@@ -16,13 +16,11 @@ indexes:
   - name: Created
     direction: desc
 
-
 - kind: Group
   properties:
   - name: Project_id
   - name: Members_count
     direction: desc
-
 
 - kind: Project
   properties:
@@ -30,11 +28,8 @@ indexes:
   - name: Created
     direction: desc
 
-
 - kind: User
   properties:
   - name: Id
   - name: Created
     direction: desc
-
-
