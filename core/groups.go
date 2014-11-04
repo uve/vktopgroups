@@ -15,6 +15,11 @@ import (
 )
 
 
+const (
+
+	GROUPS_LIMIT=3	
+	MAX_LIMIT=5000
+)
 
 
 /*
@@ -66,6 +71,32 @@ type Message struct {
 }
 
 
+
+
+
+func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *GroupsListResp) error {
+
+	c := endpoints.NewContext(r)
+
+	project_id, _ := getProjectKey(c, req.Project_id)
+
+
+	results, err := fetchGroups(c, project_id, req.Limit)
+	if err != nil {
+		return err
+	}
+
+	resp.Items = make([]*GroupJson, len(results))
+	for i, item := range results {
+		resp.Items[i] = item.toMessage(nil)
+	}
+
+	return nil
+}
+
+
+
+
 // GroupsList queries scores for the current user.
 // Exposed as API endpoint
 func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results *GroupsFetchResp) error {
@@ -86,9 +117,12 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	method := "execute.scan_groups"
 
 
+	limit := fmt.Sprintf("%d", req.Limit);
+
+
 	v := url.Values{}
 	v.Set("access_token", VK.Token)
-	v.Add("limit", "3")
+	v.Add("limit", limit)
 
 	v.Add("v", VK.ApiVersion)
 	v.Add("q", custom.Name)
@@ -104,6 +138,11 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
+	err = deleteAll(c, Group{})
+	err = deleteAll(c, Contact{})
+
+
+
 	var m Message
 
 	if err = json.NewDecoder(resp.Body).Decode(&m); err != nil {
@@ -111,14 +150,16 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
-	all_groups, err := fetchGroups(c, Project_id, req.Limit)
+	all_groups, err := fetchGroups(c, Project_id, MAX_LIMIT)
 	if err != nil {
 		return err
 	}
 
 	new_groups := []Group{}
 
+ 	
 
+	
 
 
 	for _,group := range m.Response {
@@ -138,9 +179,17 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 		}
 
 
+		
 
 		group.Custom_id = Custom_id;
-		group.Project_id = Project_id;
+		group.Project_id = Project_id;		
+
+
+		group.City_id    = group.City.Id
+		group.City_title = group.City.Title
+
+		group.Country_id    = group.Country.Id
+		group.Country_title = group.Country.Title
 
 		new_groups = append(new_groups, group)
 	}
@@ -152,33 +201,50 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 
+	
+	/*
+	group_keys, err := putGroups(c, &new_groups);
 
-	if err = putMulti(c, &new_groups); err != nil {
+	if err != nil {
+		panic(fmt.Sprintf("Could put to database : %s", err))
+	}
+	*/
+
+	group_keys, err := PutMulti(c, new_groups); 
+
+	if err != nil {
 		panic(fmt.Sprintf("Could put to database : %s", err))
 	}
 
-	return nil
-}
+	new_contacts := []Contact{}
 
 
+	for i := 0; i < len(group_keys); i++ {
+
+		value := new_groups[i]
+
+		for j := 0; j < len(value.Contacts); j++ {
+
+			item := value.Contacts[j]
+
+			item.Group_id   = group_keys[i]
+			item.Project_id = value.Project_id
+			item.Custom_id  = value.Custom_id
+
+			new_contacts = append(new_contacts, item)					
+		}
+		
+	}
 
 
-func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *GroupsListResp) error {
+	if _, err := PutMulti(c, new_contacts); err != nil {	
 
-	c := endpoints.NewContext(r)
-
-	project_id, _ := getProjectKey(c, req.Project_id)
-
-
-	results, err := fetchGroups(c, project_id, req.Limit)
-	if err != nil {
+		c.Infof("error: %v", err)
 		return err
 	}
 
-	resp.Items = make([]*GroupJson, len(results))
-	for i, item := range results {
-		resp.Items[i] = item.toMessage(nil)
-	}
+
+	c.Infof("new contacts: %v", len(new_contacts))
 
 	return nil
 }

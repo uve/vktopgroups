@@ -12,12 +12,6 @@ const (
 )
 
 
-type Contacts struct {
-	User_id	       int    `json:"user_id"`
-	Desc 		   string `json:"desc"`
-	Phone          string `json:"phone"`
-}
-
 
 
 type GroupBase struct {
@@ -36,12 +30,37 @@ type GroupBase struct {
 	Photo_50	   string `json:"photo_50"`
 	Photo_100	   string `json:"photo_100"`
 	Photo_200	   string `json:"photo_200"`
+
+
+	City_id 	  int64 `json:"city_id"`
+	City_title    string `json:"city_title"`
+
+	Country_id 	  int64 `json:"country_id"`
+	Country_title string `json:"country_title"`
+}
+
+
+type GroupCity struct {
+
+	Id 	  int64  `json:"id"`
+	Title string `json:"title"`
+}
+
+type GroupCountry struct {
+
+	Id 	  int64  `json:"id"`
+	Title string `json:"title"`
 }
 
 
 type Group struct {
 
 	GroupBase
+
+	City           GroupCity    `datastore:"-" json:"city"`          
+	Country        GroupCountry `datastore:"-" json:"country"`          
+
+	Contacts 	   []Contact `datastore:"-" json:"contacts"`
 
 	key 		   *datastore.Key
 
@@ -57,7 +76,7 @@ type GroupJson struct {
 
 	Id      	   int64  	  `json:"id"`
 
-	Contacts 	   []Contacts `json:"contacts"`
+	Contacts 	   []Contact `json:"contacts"`
 }
 
 
@@ -73,26 +92,6 @@ func (s *Group) toMessage(msg *GroupJson) *GroupJson {
 	return msg
 }
 
-
-
-
-func putMulti(c appengine.Context, s *[]Group) (error){
-
-	keys := make([]*datastore.Key, len(*s))
-
-	for i := 0; i < len(*s); i++ {
-		keys[i] = datastore.NewKey(c, "Group", "", 0, nil)
-	}
-
-	_, err := datastore.PutMulti(c, keys, *s)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
 
 
 
@@ -122,4 +121,45 @@ func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*
 
 
 
+
+
+func putGroups(c appengine.Context, items *[]Group) ([]*datastore.Key, error){
+
+	incomplete_keys := make([]*datastore.Key, len(*items))
+
+	for i := 0; i < len(*items); i++ {
+		incomplete_keys[i] = datastore.NewKey(c, "Group", "", 0, nil)
+	}
+
+	keys, err := datastore.PutMulti(c, incomplete_keys, *items)
+	if err != nil {
+		return nil, err
+	}
+
+	return keys, nil
+}
+
+
+
+/*
+func deleteGroups(c appengine.Context) (error) {
+
+	
+	q:= datastore.NewQuery(GROUP_KIND).KeysOnly()
+
+	results := make([]*Group, 0, QUERY_MAX)
+	keys, err := q.GetAll(c, &results)
+	if err != nil {
+		return err
+	}
+
+
+	err = datastore.DeleteMulti(c, keys)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+*/
 

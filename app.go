@@ -39,6 +39,7 @@ func serve404(w http.ResponseWriter) {
 type Params struct {
 	ClientId  string
 	RootUrl string
+	IsDevAppServer bool
 
 }
 
@@ -55,9 +56,13 @@ func oauth2callback(w http.ResponseWriter, r *http.Request) {
 
 func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Content-Type", "text/html")
+
 	params := Params{
 		ClientId: core.ClientId,
 		RootUrl: core.RootUrl,
+		IsDevAppServer : appengine.IsDevAppServer(),
 	}
 		
 

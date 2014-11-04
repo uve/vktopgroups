@@ -3,15 +3,26 @@
   <head>
     <!-- 1. Load platform.js for polyfill support. -->
 
-    <script src="https://storage.googleapis.com/mindale/polymer/bower_components/platform/platform.js"></script>
+	{{if .IsDevAppServer}} 
 
-    
-    <link rel="import" href="/polymer/base.html">
+		<script src="/polymer/bower_components/platform/platform.js"></script>
+		<link rel="import" href="/polymer/base.html">
+
+	{{else}}
+
+		<script src="https://storage.googleapis.com/vktopgroups/polymer/platform.js"></script>
+		<script src="https://storage.googleapis.com/vktopgroups/polymer/polymer.js"></script>    
+		<script src="https://storage.googleapis.com/vktopgroups/polymer/build.js"></script>
+
+		<link rel="import" href="https://storage.googleapis.com/vktopgroups/polymer/build.html">
+		
+	{{end}}
+
 
   </head>
   <body>
 
-  <index-element clientId="{{.ClientId}}" RootUrl="{{.RootUrl}}"></index-element>
+  <base-element clientId="{{.ClientId}}" RootUrl="{{.RootUrl}}"></base-element>
 
 
   </body>

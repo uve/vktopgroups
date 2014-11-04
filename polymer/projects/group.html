@@ -1,8 +1,7 @@
 
 
-<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-icons/core-icons.html">
-<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-button/paper-button.html">
-
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 
 
 <polymer-element name="projects-group" attributes="api project_id">
@@ -43,8 +42,8 @@
 
         </div>
 
-        <paper-button class="colored" label="get List" on-tap={{getList}}></paper-button>
-        <paper-button class="colored" label="fetch List" on-tap={{fetchList}}></paper-button>
+        <paper-button class="colored" on-tap={{getList}}>обновить списокв</paper-button>
+        
 
 
     </template>
@@ -82,23 +81,8 @@
                     this.items = [];
                 });
 
-            },
+            }
 
-
-             fetchList: function () {
-
-                 this.api.groups.fetch({
-                     "custom_id": "5118776383111168",
-                     "limit": 1000
-
-                 }).then(function (resp) {
-
-                 }.bind(this),
-                 function (err) {
-
-                 });
-
-             }
 
          });
 

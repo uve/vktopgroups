@@ -1,11 +1,11 @@
 
 
-<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-dialog/paper-dialog-transition.html">
-<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 
-<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-icons/core-icons.html">
-<link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 
 
 
@@ -65,16 +65,16 @@
 
 
 
-        <paper-button class="colored" label="Create New Project" on-tap={{openDialog}}></paper-button>
+        <paper-button class="colored" on-tap={{openDialog}}>Создать проект</paper-button>
 
 
 
-          <paper-dialog id="createDialog" heading="Create new Project" transition="paper-dialog-transition-center">
+          <paper-dialog id="createDialog" heading="Создание нового проекта" transition="paper-dialog-transition-center">
             
 
-            <paper-input id="createProjectName" label="Type new project name"></paper-input>
+            <paper-input id="createProjectName" >Введите имя проекта</paper-input>
             
-            <paper-button label="Create" on-tap={{createProject}} affirmative autofocus></paper-button>
+            <paper-button on-tap={{createProject}} affirmative autofocus>Создать</paper-button>
 
           </paper-dialog>
 

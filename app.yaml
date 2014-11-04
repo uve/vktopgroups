@@ -17,6 +17,7 @@ default_expiration: "1s"
 skip_files:
 #- (.*/)?#.*#$
 - ^(.*/)?sync$
+- ^polymer/bower_components$
 #- ^(.*/)?.*~$
 #- ^(.*/)?.*\.py[co]$
 #- ^(.*/)?.*/RCS/.*$
@@ -32,7 +33,8 @@ skip_files:
 #- ^(.*/)?.*marked
 #- ^(.*/)?.*pkg
 #- ^(.*/)?.*.a
-- ^(.*/)?polymer/bower_components/*
+#- ^(.*/)?polymer/bower_components/*
+
 
 
 handlers:
@@ -45,11 +47,6 @@ handlers:
 - url: /polymer
   static_dir: polymer
   application_readable: true
-
-#- url: /polymer/index.html
-#  static_files: polymer/index.html
-#  upload:  polymer/index.html
-#  application_readable: true
 
 
 - url: /.*

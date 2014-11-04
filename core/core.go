@@ -29,6 +29,7 @@ var (
 )
 
 
+
 type BoardMsg struct {
 	State string `json:"state" endpoints:"required"`
 }
