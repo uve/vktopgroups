@@ -12,6 +12,8 @@ import (
 	"encoding/json"
 
 
+	"db"
+
 )
 
 
@@ -105,10 +107,15 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 	server := "https://api.vk.com/method"
 
-	Custom_id, custom, _ := getCustom(c, req.Custom_id)
+
+	var custom Custom
+
+	custom_key, _ := custom.Get(c, req.Custom_id)
+
+
 	Project_id := custom.Project_id
 
-	c.Infof("Custom_id: %v",  Custom_id)
+	c.Infof("Custom_id: %v",  custom_key)
 	c.Infof("Project_id: %v", Project_id)
 
 	c.Infof("Seach id: %v",    req.Custom_id)
@@ -138,8 +145,8 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
-	err = deleteAll(c, Group{})
-	err = deleteAll(c, Contact{})
+	err = db.DeleteAll(c, Group{})
+	err = db.DeleteAll(c, Contact{})
 
 
 
@@ -157,10 +164,6 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 	new_groups := []Group{}
 
- 	
-
-	
-
 
 	for _,group := range m.Response {
 
@@ -177,11 +180,9 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 		if is_exist {
 			continue
 		}
-
-
 		
 
-		group.Custom_id = Custom_id;
+		group.Custom_id = custom_key;
 		group.Project_id = Project_id;		
 
 
@@ -201,16 +202,8 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 
-	
-	/*
-	group_keys, err := putGroups(c, &new_groups);
 
-	if err != nil {
-		panic(fmt.Sprintf("Could put to database : %s", err))
-	}
-	*/
-
-	group_keys, err := PutMulti(c, new_groups); 
+	group_keys, err := db.PutMulti(c, new_groups);
 
 	if err != nil {
 		panic(fmt.Sprintf("Could put to database : %s", err))
@@ -237,7 +230,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
-	if _, err := PutMulti(c, new_contacts); err != nil {	
+	if _, err := db.PutMulti(c, new_contacts); err != nil {
 
 		c.Infof("error: %v", err)
 		return err

@@ -97,7 +97,7 @@ func (s *Group) toMessage(msg *GroupJson) *GroupJson {
 
 func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*Group, error) {
 
-	if limit<= 0 {
+	if limit <= 0 {
 		limit = 10
 	}
 
@@ -120,46 +120,4 @@ func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*
 
 
 
-
-
-
-func putGroups(c appengine.Context, items *[]Group) ([]*datastore.Key, error){
-
-	incomplete_keys := make([]*datastore.Key, len(*items))
-
-	for i := 0; i < len(*items); i++ {
-		incomplete_keys[i] = datastore.NewKey(c, "Group", "", 0, nil)
-	}
-
-	keys, err := datastore.PutMulti(c, incomplete_keys, *items)
-	if err != nil {
-		return nil, err
-	}
-
-	return keys, nil
-}
-
-
-
-/*
-func deleteGroups(c appengine.Context) (error) {
-
-	
-	q:= datastore.NewQuery(GROUP_KIND).KeysOnly()
-
-	results := make([]*Group, 0, QUERY_MAX)
-	keys, err := q.GetAll(c, &results)
-	if err != nil {
-		return err
-	}
-
-
-	err = datastore.DeleteMulti(c, keys)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-*/
 

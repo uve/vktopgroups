@@ -67,6 +67,7 @@ func (s *Project) put(c appengine.Context) (err error) {
 	return
 }
 
+
 // newProject returns a new Project ready to be stored in the Datastore.
 func newProject(name string, u *user.User) *Project {
 	//return &Project{Outcome: outcome, Played: time.Now(), Player: userId(u)}

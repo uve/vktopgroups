@@ -10,6 +10,9 @@ import (
 
 	"github.com/crhym3/go-endpoints/endpoints"
 
+	"db"
+	"time"
+	//"errors"
 )
 
 
@@ -48,10 +51,20 @@ func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, res
 		return err
 	}
 
-	item := newCustom(req.Name, project_id)
-	if err := item.put(c); err != nil {
+	item := &Custom{
+
+		Name: req.Name,
+		Created: time.Now(),
+		Project_id: project_id,
+	}
+
+	key, err := db.Put(c, item)
+	if err != nil {
 		return err
 	}
+
+	item.key = key
+
 	item.toMessage(resp)
 
 	return nil

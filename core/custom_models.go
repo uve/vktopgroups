@@ -55,17 +55,6 @@ func (s *Custom) put(c appengine.Context) (err error) {
 	return nil
 }
 
-// newProject returns a new Project ready to be stored in the Datastore.
-func newCustom(name string, project_id *datastore.Key) *Custom {
-	//return &Project{Outcome: outcome, Played: time.Now(), Player: userId(u)}
-
-	return &Custom{
-				Name: name,				
-				Created: time.Now(),
-				Project_id: project_id,
-			}
-}
-
 
 
 
@@ -96,14 +85,14 @@ func fetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]
 
 
 
-func getCustom(c appengine.Context, id int64) (*datastore.Key, *Custom, error){
 
-	k := datastore.NewKey(c, "Custom", "", id, nil)
-	e := new(Custom)
-	if err := datastore.Get(c, k, e); err != nil {
-		//http.Error(w, err.Error(), 500)
-		return nil, nil, err
+func (s *Custom) Get(c appengine.Context, id int64) (*datastore.Key, error){
+
+	key := datastore.NewKey(c, "Custom", "", id, nil)
+
+	if err := datastore.Get(c, key, s); err != nil {
+		return nil,  err
 	}
 
-	return k, e, nil
+	return key, nil
 }
