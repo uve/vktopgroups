@@ -1,4 +1,4 @@
-package db
+package models
 
 import (
 	"appengine"
@@ -13,6 +13,9 @@ import (
 
 
 const (
+
+	TIME_LAYOUT = "02.01Jan 2, 2006 15:04:05 AM"
+	
 	QUERY_MAX = 5000
 )
 
