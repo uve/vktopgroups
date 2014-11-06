@@ -110,12 +110,12 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 	var custom Custom
 
-	custom_key, _ := custom.Get(c, req.Custom_id)
+	custom_id, _ := custom.Get(c, req.Custom_id)
 
 
 	Project_id := custom.Project_id
 
-	c.Infof("Custom_id: %v",  custom_key)
+	c.Infof("Custom_id: %v",  custom_id)
 	c.Infof("Project_id: %v", Project_id)
 
 	c.Infof("Seach id: %v",    req.Custom_id)
@@ -182,7 +182,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 		}
 		
 
-		group.Custom_id = custom_key;
+		group.Custom_id = custom_id;
 		group.Project_id = Project_id;		
 
 
