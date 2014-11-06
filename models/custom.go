@@ -1,4 +1,4 @@
-package core
+package models
 
 import (
 	"time"
@@ -15,22 +15,11 @@ const (
 
 
 type Custom struct {
-	key *datastore.Key
+	Key *datastore.Key 		`datastore:"-"`     
 	
 	Name    string
 	Created time.Time	
 	Project_id *datastore.Key// `datastore:"Project_id,noindex"`
-}
-
-
-func (s *Custom) toMessage(msg *ResponseMsgCustom) *ResponseMsgCustom {
-	if msg == nil {
-		msg = &ResponseMsgCustom{}
-	}
-	msg.Id = s.key.IntID()
-	msg.Name = s.Name
-
-	return msg
 }
 
 
@@ -42,7 +31,7 @@ func (s *Custom) timestamp() string {
 
 func (s *Custom) put(c appengine.Context) (err error) {
 
-	key := s.key
+	key := s.Key
 	if key == nil {
 		key = datastore.NewKey(c, CUSTOM_KIND, "", 0,  nil)
 	}
@@ -50,7 +39,7 @@ func (s *Custom) put(c appengine.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	s.key = key
+	s.Key = key
 	
 	return nil
 }
@@ -60,7 +49,7 @@ func (s *Custom) put(c appengine.Context) (err error) {
 
 // fetchProjects runs Query q and returns Project entities fetched from the
 // Datastore.
-func fetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]*Custom, error) {
+func FetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]*Custom, error) {
 
 	if limit<= 0 {
 		limit = 10
@@ -77,7 +66,7 @@ func fetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]
 	for i, item := range results {
 
 		//c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
-		item.key = keys[i]
+		item.Key = keys[i]
 	}
 
 	return results, nil

@@ -10,7 +10,9 @@ import (
 
 	"github.com/crhym3/go-endpoints/endpoints"
 
-	"db"
+	"models"
+	
+
 	"time"
 	//"errors"
 )
@@ -41,6 +43,20 @@ type ListResponseCustoms struct {
 }
 
 
+/*
+func (s *models.Custom) toMessage(msg *ResponseMsgCustom) *ResponseMsgCustom {
+	if msg == nil {
+		msg = &ResponseMsgCustom{}
+	}
+	msg.Id = s.key.IntID()
+	msg.Name = s.Name
+
+	return msg
+}
+*/
+
+
+
 
 func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, resp *ResponseMsgCustom) error {
 
@@ -51,21 +67,21 @@ func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, res
 		return err
 	}
 
-	item := &Custom{
+	item := &models.Custom{
 
 		Name: req.Name,
 		Created: time.Now(),
 		Project_id: project_id,
 	}
 
-	key, err := db.Put(c, item)
+	key, err := models.Put(c, item)
 	if err != nil {
 		return err
 	}
 
-	item.key = key
+	item.Key = key
 
-	item.toMessage(resp)
+	//item.toMessage(resp)
 
 	return nil
 }
@@ -87,15 +103,20 @@ func (api *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, res
 	}
 	*/
 
-	results, err := fetchCustoms(c, project_id, req.Limit)
+	results, err := models.FetchCustoms(c, project_id, req.Limit)
 	if err != nil {
 		return err
 	}
 	
+	
 	resp.Items = make([]*ResponseMsgCustom, len(results))
 	for i, item := range results {
-		resp.Items[i] = item.toMessage(nil)
+		//resp.Items[i] = item.toMessage(nil)
+		c.Infof("%v", i)
+		c.Infof("%v",item)
+		
 	}
+	
 
 	return nil
 }

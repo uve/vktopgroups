@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 
 
-	"db"
+	"models"
 
 )
 
@@ -108,7 +108,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	server := "https://api.vk.com/method"
 
 
-	var custom Custom
+	var custom models.Custom
 
 	custom_id, _ := custom.Get(c, req.Custom_id)
 
@@ -145,8 +145,8 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
-	err = db.DeleteAll(c, Group{})
-	err = db.DeleteAll(c, Contact{})
+	err = models.DeleteAll(c, Group{})
+	err = models.DeleteAll(c, Contact{})
 
 
 
@@ -203,7 +203,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 
-	group_keys, err := db.PutMulti(c, new_groups);
+	group_keys, err := models.PutMulti(c, new_groups);
 
 	if err != nil {
 		panic(fmt.Sprintf("Could put to database : %s", err))
@@ -230,7 +230,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
-	if _, err := db.PutMulti(c, new_contacts); err != nil {
+	if _, err := models.PutMulti(c, new_contacts); err != nil {
 
 		c.Infof("error: %v", err)
 		return err
