@@ -5,6 +5,7 @@ import (
 	"appengine/datastore"
 	"appengine/user"
 
+	"model"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 // Project is an entity to store projects that have been inserted by users.
 type Project struct {
 
-	*Default
+	Default
 
 
 
@@ -32,7 +33,7 @@ type Project struct {
 
 
 
-func projectCreate(name string, user string) (*Project){
+func NewProject(name string, user string) (*Project){
 
 	return &Project{
 		Name: name,
@@ -42,19 +43,27 @@ func projectCreate(name string, user string) (*Project){
 }
 
 
-func (s *Project) put(c appengine.Context) (err error) {
+func (src *Project) put(c appengine.Context) (*datastore.Key, error) {
 
-	return s.Default.put(s, c)
+	key, err := model.Put(c, src)
+	if err != nil{
+		return nil, err
+	}
+
+	src.setKey(key)
+
+	return key, nil
 }
 
 // Turns the Project struct/entity into a ProjectRespMsg which is then used
 // as an API response.
 
 func (s *Project) toMessage(msg *ProjectRespMsg) *ProjectRespMsg {
+
 	if msg == nil {
 		msg = &ProjectRespMsg{}
 	}
-	//msg.Id = s.key.IntID()
+	msg.Id = s.Id()
 	msg.Name = s.Name
 	//msg.Created = s.timestamp()
 
@@ -73,7 +82,7 @@ func newUserProjectQuery(u *user.User) *datastore.Query {
 
 // fetchProjects runs Query q and returns Project entities fetched from the
 // Datastore.
-func fetchProjects(c appengine.Context, q *datastore.Query, limit int) ([]*Project, error) {
+func fetch(c appengine.Context, q *datastore.Query, limit int) ([]*Project, error) {
 
 	projects := make([]*Project, 0, limit)
 	keys, err := q.Limit(limit).GetAll(c, &projects)
@@ -81,7 +90,7 @@ func fetchProjects(c appengine.Context, q *datastore.Query, limit int) ([]*Proje
 		return nil, err
 	}
 	for i, project := range projects {
-		project.key = keys[i]
+		project.setKey(keys[i])
 	}
 	return projects, nil
 }

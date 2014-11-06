@@ -40,10 +40,10 @@ func (api *ServiceApi) ProjectsCreate(r *http.Request,	req *ProjectReqMsg, resp 
 		return err
 	}
 
-
-	project := projectCreate(req.Name, userId(u))
-
-	if err := project.put(c); err != nil {
+	project := NewProject(req.Name, userId(u))
+	
+	_, err = project.put(c)
+	if err != nil {
 		return err
 	}
 
@@ -65,7 +65,7 @@ func (api *ServiceApi) ProjectsList(r *http.Request, req *ProjectsListReq, resp 
 	if req.Limit <= 0 {
 		req.Limit = 10
 	}
-	results, err := fetchProjects(c, q, req.Limit)
+	results, err := fetch(c, q, req.Limit)
 	if err != nil {
 		return err
 	}

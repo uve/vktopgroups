@@ -30,6 +30,26 @@ type DefaultService interface {
 }
 
 
+func (s *Default) Key() *datastore.Key {
+	return s.key
+}
+
+
+func (s *Default) Id() int64 {
+
+	/*
+	if s.Key() == nil{
+		return 0
+	}
+	*/
+	return s.Key().IntID()
+}
+
+
+func (s *Default) setKey(key *datastore.Key) {
+	s.key = key
+}
+
 
 func (s *Default) put(src interface {}, c appengine.Context) (err error) {
 	key := s.key
@@ -42,7 +62,7 @@ func (s *Default) put(src interface {}, c appengine.Context) (err error) {
 
 	c.Infof("PUT: %s", key)
 
-	key, err = datastore.Put(c, key, s)
+	key, err = datastore.Put(c, key, src)
 
 	if err != nil {
 		return err
@@ -72,6 +92,6 @@ func (s *Default) timestamp() string {
 	return s.Created.Format(TIME_LAYOUT)	
 }
 
-func NewDefault() (s *Default) {
-	return &Default{Created: time.Now()}
+func NewDefault() (s Default) {
+	return Default{Created: time.Now()}
 }
