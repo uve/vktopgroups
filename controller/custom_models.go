@@ -1,4 +1,4 @@
-package models
+package controller
 
 import (
 	"time"
@@ -47,6 +47,11 @@ func (s *Custom) put(c appengine.Context) (err error) {
 
 
 
+
+
+
+
+
 // fetchProjects runs Query q and returns Project entities fetched from the
 // Datastore.
 func FetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]*Custom, error) {
@@ -76,6 +81,8 @@ func FetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]
 
 
 func (s *Custom) Get(c appengine.Context, id int64) (*datastore.Key, error){
+
+	c.Infof("################### id:  %v", id)
 
 	key := datastore.NewKey(c, "Custom", "", id, nil)
 

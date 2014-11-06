@@ -1,4 +1,4 @@
-package core
+package controller
 
 import (
 	//"errors"
@@ -10,7 +10,7 @@ import (
 
 	"github.com/crhym3/go-endpoints/endpoints"
 
-	"models"
+	"model"
 	
 
 	"time"
@@ -43,49 +43,49 @@ type ListResponseCustoms struct {
 }
 
 
-/*
-func (s *models.Custom) toMessage(msg *ResponseMsgCustom) *ResponseMsgCustom {
-	if msg == nil {
-		msg = &ResponseMsgCustom{}
-	}
-	msg.Id = s.key.IntID()
-	msg.Name = s.Name
-
-	return msg
-}
-*/
-
-
 
 
 func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, resp *ResponseMsgCustom) error {
 
 	c := endpoints.NewContext(r)
 
-	project_id, err := getProjectKey(c, req.Project_id)
+	var project Project
+
+	project_id, err := project.get(c, req.Project_id)
 	if err != nil {
 		return err
 	}
 
-	item := &models.Custom{
+	item := &Custom{
 
 		Name: req.Name,
 		Created: time.Now(),
 		Project_id: project_id,
 	}
 
-	key, err := models.Put(c, item)
+	key, err := model.Put(c, item)
 	if err != nil {
 		return err
 	}
 
 	item.Key = key
 
-	//item.toMessage(resp)
+	item.toMessage(resp)
 
 	return nil
 }
 
+
+
+func (s *Custom) toMessage(msg *ResponseMsgCustom) *ResponseMsgCustom {
+	if msg == nil {
+		msg = &ResponseMsgCustom{}
+	}
+	msg.Id = s.Key.IntID()
+	msg.Name = s.Name
+
+	return msg
+}
 
 
 
@@ -96,14 +96,16 @@ func (api *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, res
 
 	c.Infof("New List query")
 
-	project_id, _ := getProjectKey(c, req.Project_id)
-	/*
-	if err != nil {
-		return errz
-	}
-	*/
 
-	results, err := models.FetchCustoms(c, project_id, req.Limit)
+	var project Project
+
+	project_id, err := project.get(c, req.Project_id)
+	if err != nil {
+		return err
+	}
+
+
+	results, err := FetchCustoms(c, project_id, req.Limit)
 	if err != nil {
 		return err
 	}
@@ -111,7 +113,7 @@ func (api *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, res
 	
 	resp.Items = make([]*ResponseMsgCustom, len(results))
 	for i, item := range results {
-		//resp.Items[i] = item.toMessage(nil)
+		resp.Items[i] = item.toMessage(nil)
 		c.Infof("%v", i)
 		c.Infof("%v",item)
 		

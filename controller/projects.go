@@ -1,8 +1,10 @@
-package core
+package controller
 
 import (
+
 	"net/http"
 	"github.com/crhym3/go-endpoints/endpoints"
+
 )
 
 
@@ -28,19 +30,23 @@ type ProjectsListResp struct {
 }
 
 
-// ProjectsInsert inserts a new score for the current user.
-func (api *ServiceApi) ProjectsCreate(r *http.Request,
-	req *ProjectReqMsg, resp *ProjectRespMsg) error {
+
+func (api *ServiceApi) ProjectsCreate(r *http.Request,	req *ProjectReqMsg, resp *ProjectRespMsg) error {
 
 	c := endpoints.NewContext(r)
-	u, err := getCurrentUser(c)
+
+	u, err := GetCurrentUser(c)
 	if err != nil {
 		return err
 	}
-	project := newProject(req.Name, u)
+
+
+	project := projectCreate(req.Name, userId(u))
+
 	if err := project.put(c); err != nil {
 		return err
 	}
+
 	project.toMessage(resp)
 
 	return nil
@@ -48,14 +54,10 @@ func (api *ServiceApi) ProjectsCreate(r *http.Request,
 
 
 
-
-// ProjectsList queries scores for the current user.
-// Exposed as API endpoint
-func (api *ServiceApi) ProjectsList(r *http.Request,
-	req *ProjectsListReq, resp *ProjectsListResp) error {
+func (api *ServiceApi) ProjectsList(r *http.Request, req *ProjectsListReq, resp *ProjectsListResp) error {
 
 	c := endpoints.NewContext(r)
-	u, err := getCurrentUser(c)
+	u, err := GetCurrentUser(c)
 	if err != nil {
 		return err
 	}
@@ -72,6 +74,7 @@ func (api *ServiceApi) ProjectsList(r *http.Request,
 	for i, item := range results {
 		resp.Items[i] = item.toMessage(nil)
 	}
+
 	return nil
 }
 

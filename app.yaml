@@ -39,13 +39,20 @@ skip_files:
 
 handlers:
 
+
+
+- url: /robots.txt
+  static_files: static/robots.txt
+  upload:  static/robots.txt
+
+
 - url: /favicon.ico
   static_files: static/favicon.ico
   upload:  static/favicon.ico
 
 
-- url: /polymer
-  static_dir: polymer
+- url: /view
+  static_dir: view
   application_readable: true
 
 

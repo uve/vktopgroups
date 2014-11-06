@@ -1,4 +1,4 @@
-package core
+package controller
 
 import (
 	"net/http"
@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 
 
-	"models"
+	"model"
 
 )
 
@@ -21,17 +21,10 @@ const (
 
 	GROUPS_LIMIT=3	
 	MAX_LIMIT=5000
+
 )
 
 
-/*
-type UserResponse struct {
-	Id		   int `json:"id"`
-	First_name string `json:"first_name"`
-	Last_name  string `json:"last_name"`
-	Photo      string `json:"photo"`
-}
-*/
 
 type GroupsListReq struct {
 	Limit 	   int    `json:"limit"`
@@ -60,12 +53,6 @@ type GroupsFetchResp struct {
 
 
 
-
-/*
-type GroupsResponse struct {
-	Group
-}
-*/
 type Message struct {
 
 	Response []Group `json:"response"`
@@ -80,8 +67,12 @@ func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *Gro
 
 	c := endpoints.NewContext(r)
 
-	project_id, _ := getProjectKey(c, req.Project_id)
+	var project Project
 
+	project_id, err := project.get(c, req.Project_id)
+	if err != nil {
+		return err
+	}
 
 	results, err := fetchGroups(c, project_id, req.Limit)
 	if err != nil {
@@ -99,7 +90,7 @@ func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *Gro
 
 
 
-// GroupsList queries scores for the current user.
+// GroupsList queries scontrollers for the current user.
 // Exposed as API endpoint
 func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results *GroupsFetchResp) error {
 
@@ -108,7 +99,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	server := "https://api.vk.com/method"
 
 
-	var custom models.Custom
+	var custom Custom
 
 	custom_id, _ := custom.Get(c, req.Custom_id)
 
@@ -145,8 +136,8 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
-	err = models.DeleteAll(c, Group{})
-	err = models.DeleteAll(c, Contact{})
+	err = model.DeleteAll(c, Group{})
+	err = model.DeleteAll(c, Contact{})
 
 
 
@@ -201,9 +192,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 
-
-
-	group_keys, err := models.PutMulti(c, new_groups);
+	group_keys, err := model.PutMulti(c, new_groups);
 
 	if err != nil {
 		panic(fmt.Sprintf("Could put to database : %s", err))
@@ -230,7 +219,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	}
 
 
-	if _, err := models.PutMulti(c, new_contacts); err != nil {
+	if _, err := model.PutMulti(c, new_contacts); err != nil {
 
 		c.Infof("error: %v", err)
 		return err

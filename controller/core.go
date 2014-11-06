@@ -1,4 +1,4 @@
-package core
+package controller
 
 import (
 	"errors"
@@ -7,8 +7,8 @@ import (
 
 	"github.com/crhym3/go-endpoints/endpoints"
 
-
 	"config"
+
 )
 
 
@@ -17,8 +17,6 @@ var (
 	clientIds = []string{ClientId, endpoints.ApiExplorerClientId}
 	// in case we'll want to use Mindale API from an Android app
 	audiences = []string{ClientId}
-
-
 
 
 
@@ -72,7 +70,7 @@ func (api *ServiceApi) BoardGetMove(r *http.Request,
 	return nil
 }
 
-// ProjectsList queries scores for the current user.
+// ProjectsList queries scontrollers for the current user.
 // Exposed as API endpoint
 func (api *ServiceApi) ProjectsList(r *http.Request,
 	req *ProjectsListReq, resp *ProjectsListResp) error {
@@ -86,13 +84,13 @@ func (api *ServiceApi) ProjectsList(r *http.Request,
 	if req.Limit <= 0 {
 		req.Limit = 10
 	}
-	scores, err := fetchProjects(c, q, req.Limit)
+	scontrollers, err := fetchProjects(c, q, req.Limit)
 	if err != nil {
 		return err
 	}
-	resp.Items = make([]*ProjectRespMsg, len(scores))
-	for i, score := range scores {
-		resp.Items[i] = score.toMessage(nil)
+	resp.Items = make([]*ProjectRespMsg, len(scontrollers))
+	for i, scontroller := range scontrollers {
+		resp.Items[i] = scontroller.toMessage(nil)
 	}
 	return nil
 }
@@ -103,7 +101,7 @@ func (api *ServiceApi) ProjectsList(r *http.Request,
 // getCurrentUser retrieves a user associated with the request.
 // If there's no user (e.g. no auth info present in the request) returns
 // an "unauthorized" error.
-func getCurrentUser(c endpoints.Context) (*user.User, error) {
+func GetCurrentUser(c endpoints.Context) (*user.User, error) {
 
 	user, err := endpoints.CurrentUser(c, scopes, audiences, clientIds)
 	if err != nil {
@@ -127,6 +125,21 @@ func createMethod(rpcService *endpoints.RpcService, service, path, method, name 
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 }
 
+/*
+type Entity interface {
+
+	UnmarshalHTTP(*http.Request) error
+}
+
+func GetEntity(r *http.Request, v Entity) error {
+	return v.UnmarshalHTTP(r)
+}
+
+func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *GroupsListResp) error {
+
+}
+*/
+
 
 
 // RegisterService exposes ServiceApi methods as API endpoints.
@@ -137,11 +150,11 @@ func createMethod(rpcService *endpoints.RpcService, service, path, method, name 
 // e.g. http://github.com/crhym3/go-endpoints.appspot.com.
 func RegisterService() (*endpoints.RpcService, error) {
 	api := &ServiceApi{}
-	rpcService, err := endpoints.RegisterService(api,
-		"vktopgroups", "v1", "VK Top groups API", true)
+	rpcService, err := endpoints.RegisterService(api, "vktopgroups", "v1", "VK Top groups API", true)
 	if err != nil {
 		return nil, err
 	}
+
 
 
 
@@ -149,10 +162,10 @@ func RegisterService() (*endpoints.RpcService, error) {
 	info.Path, info.HttpMethod, info.Name = "projects/list", "GET", "projects.list"
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
+
 	info = rpcService.MethodByName("ProjectsCreate").Info()
 	info.Path, info.HttpMethod, info.Name = "projects/create", "POST", "projects.create"
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
 
 
 	info = rpcService.MethodByName("CustomsList").Info()
@@ -177,7 +190,7 @@ func RegisterService() (*endpoints.RpcService, error) {
 
 /*
 	info = rpcService.MethodByName("ProjectsInsert").Info()
-	info.Path, info.HttpMethod, info.Name = "scores", "POST", "projects.insert"
+	info.Path, info.HttpMethod, info.Name = "scontrollers", "POST", "projects.insert"
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 	
@@ -193,15 +206,14 @@ func RegisterService() (*endpoints.RpcService, error) {
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 	info = rpcService.MethodByName("ProjectsList").Info()
-	info.Path, info.HttpMethod, info.Name = "scores", "GET", "scores.list"
+	info.Path, info.HttpMethod, info.Name = "scontrollers", "GET", "scontrollers.list"
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 	info = rpcService.MethodByName("ProjectsInsert").Info()
-	info.Path, info.HttpMethod, info.Name = "scores", "POST", "scores.insert"
+	info.Path, info.HttpMethod, info.Name = "scontrollers", "POST", "scontrollers.insert"
 	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
 
 */
 	return rpcService, nil
 }
-
 

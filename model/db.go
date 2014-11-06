@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"appengine"
@@ -6,8 +6,8 @@ import (
 
 	"reflect"
 	"strings"
-	"errors"
 
+	"errors"
 )
 
 
@@ -56,7 +56,7 @@ func DeleteAll(c appengine.Context, any interface{}) (error) {
 
 
 
-func getKind(src interface{}) (string){
+func GetKind(src interface{}) (string){
 
 	items := reflect.ValueOf(src)
 
@@ -76,17 +76,26 @@ func getKind(src interface{}) (string){
 	return kind
 }
 
+/*
+type Service interface {
+  func Key()
+  func SetKey(v)
+}
 
+func Key(p Project) {*datastore.Key, error){
 
+}
+*/
 
 func Put(c appengine.Context, src interface{}) (*datastore.Key, error) {
 
+	//key := src.key
 
 	if reflect.ValueOf(src).Kind() != reflect.Ptr{
 		return nil, errors.New("Value's type is not Ptr")
 	}
 
-	kind := getKind(src)
+	kind := GetKind(src)
 
 	incomplete_keys := datastore.NewKey(c, kind, "", 0, nil)
 
@@ -116,7 +125,7 @@ func PutMulti(c appengine.Context, src interface{}) ([]*datastore.Key, error){
 		return nil, errors.New("PutMulti: slice length < 1")
 	}
 
-	kind := getKind(src)
+	kind := GetKind(src)
 	//c.Infof("kind: %v", kind)
 
 
@@ -139,7 +148,7 @@ func PutMulti(c appengine.Context, src interface{}) ([]*datastore.Key, error){
 
 func GetKey(c appengine.Context, src interface {}, id int64) (*datastore.Key, error){
 
-	kind := getKind(src)
+	kind := GetKind(src)
 
 	key := datastore.NewKey(c, kind, "", id, nil)
 

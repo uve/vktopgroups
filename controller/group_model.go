@@ -1,8 +1,9 @@
-package core
+package controller
 
 import (
 	"appengine"
 	"appengine/datastore"
+
 )
 
 
