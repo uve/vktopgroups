@@ -3,10 +3,10 @@ package controller
 import (
 	"time"
 
+	"model"
 	"appengine"
 	"appengine/datastore"
 
-	"model"
 )
 
 const (
@@ -23,11 +23,16 @@ type Default struct {
 }
 
 
-type DefaultService interface {
 
-	Key(*datastore.Key, error)
-	SetKey(*datastore.Key) error
+
+type DefaultInterface interface {
+
+	Key() *datastore.Key
+	SetKey(*datastore.Key)
+	Id() int64
 }
+
+
 
 
 func (s *Default) Key() *datastore.Key {
@@ -48,6 +53,47 @@ func (s *Default) Id() int64 {
 
 func (s *Default) setKey(key *datastore.Key) {
 	s.key = key
+}
+
+
+
+func Put(c appengine.Context, src *DefaultInterface) (*datastore.Key, err error) {
+
+
+	key := src.Key()
+
+
+	if key == nil {
+		key = datastore.NewKey(c, model.GetKind(src), "", 0,  nil)
+	}
+
+
+	c.Infof("PUT: %s", key)
+
+	key, err = datastore.Put(c, key, src)
+
+	if err != nil {
+		return err, nil
+	}
+
+	src.SetKey(key)
+
+	return key, nil
+}
+
+
+/*
+
+func (src *Project) put(c appengine.Context) (*datastore.Key, error) {
+
+	key, err := model.Put(c, src)
+	if err != nil{
+		return nil, err
+	}
+
+	src.setKey(key)
+
+	return key, nil
 }
 
 
@@ -72,6 +118,8 @@ func (s *Default) put(src interface {}, c appengine.Context) (err error) {
 
 	return nil
 }
+*/
+
 
 
 func (s *Default) get(c appengine.Context, id int64) (*datastore.Key, error){

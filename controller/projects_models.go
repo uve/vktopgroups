@@ -1,12 +1,6 @@
 package controller
 
-import (
-	"appengine"
-	"appengine/datastore"
-	"appengine/user"
-
-	"model"
-)
+import "appengine/datastore"
 
 const (
 	PROJECT_KIND  = "Project"
@@ -42,7 +36,7 @@ func NewProject(name string, user string) (*Project){
 	}
 }
 
-
+/*
 func (src *Project) put(c appengine.Context) (*datastore.Key, error) {
 
 	key, err := model.Put(c, src)
@@ -54,6 +48,7 @@ func (src *Project) put(c appengine.Context) (*datastore.Key, error) {
 
 	return key, nil
 }
+*/
 
 // Turns the Project struct/entity into a ProjectRespMsg which is then used
 // as an API response.

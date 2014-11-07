@@ -42,7 +42,7 @@ func (api *ServiceApi) ProjectsCreate(r *http.Request,	req *ProjectReqMsg, resp 
 
 	project := NewProject(req.Name, userId(u))
 	
-	_, err = project.put(c)
+	_, err = Put(c, project)
 	if err != nil {
 		return err
 	}
