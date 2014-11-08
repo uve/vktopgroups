@@ -9,12 +9,7 @@ import (
 	//"time"
 
 	"github.com/crhym3/go-endpoints/endpoints"
-
-	"model"
 	
-
-	"time"
-	//"errors"
 )
 
 
@@ -27,7 +22,7 @@ type RequestMsgCustom struct {
 type ResponseMsgCustom struct {
 	Id      int64  `json:"id"`
 	Name    string `json:"name"`
-	//Created string `json:"created"`
+	Created string `json:"created"`
 	/*Outcome string `json:"outcome"`
 	Played  string `json:"played"`*/
 }
@@ -51,24 +46,17 @@ func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, res
 
 	var project Project
 
-	project_id, err := project.get(c, req.Project_id)
+	project_id, err := project.Get(c, req.Project_id)
 	if err != nil {
 		return err
 	}
 
-	item := &Custom{
+	item := NewCustom(req.Name, project_id)
 
-		Name: req.Name,
-		Created: time.Now(),
-		Project_id: project_id,
-	}
-
-	key, err := model.Put(c, item)
+	_, err = item.Put(c)
 	if err != nil {
 		return err
 	}
-
-	item.Key = key
 
 	item.toMessage(resp)
 
@@ -81,8 +69,11 @@ func (s *Custom) toMessage(msg *ResponseMsgCustom) *ResponseMsgCustom {
 	if msg == nil {
 		msg = &ResponseMsgCustom{}
 	}
-	msg.Id = s.Key.IntID()
+	
 	msg.Name = s.Name
+
+	msg.Id 		= s.Id()
+	msg.Created = s.GetCreated()
 
 	return msg
 }
@@ -99,13 +90,19 @@ func (api *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, res
 
 	var project Project
 
-	project_id, err := project.get(c, req.Project_id)
+	key, err := project.Get(c, req.Project_id)
 	if err != nil {
+		c.Errorf("Error: %v", err)
 		return err
 	}
 
+	c.Infof("Project_id: %v", req.Project_id)
+	c.Infof("Project key: %v", key)
 
-	results, err := FetchCustoms(c, project_id, req.Limit)
+
+	q := queryCustomByProject(key)
+
+	results, err := fetchCustoms(c, q, req.Limit)
 	if err != nil {
 		return err
 	}
@@ -122,4 +119,5 @@ func (api *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, res
 
 	return nil
 }
+
 

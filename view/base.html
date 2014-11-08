@@ -6,7 +6,6 @@
   <link rel="import" href="bower_components/core-icons/core-icons.html">
 
 
-
   <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
   <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
   
@@ -22,6 +21,7 @@
   <link rel="import" href="google-signin-status.html">
 
 
+  
 
   <polymer-element name="base-element" attributes="clientId RootUrl">
 
@@ -87,3 +87,21 @@
   </polymer-element>
 
 
+<script>
+
+
+Array.prototype.choose = function(type) {
+
+    if (!this || this.length < 1){
+      return false;
+    }
+
+    if (type && type[0] && type[0].addedCount > 0){
+        return this[this.length - 1].id; 
+    }
+
+    return this[0].id;
+}
+
+
+</script>

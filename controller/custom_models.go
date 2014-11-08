@@ -1,82 +1,81 @@
 package controller
 
 import (
-	"time"
 
 	"appengine"
 	"appengine/datastore"
+
+	"model"
 	
 )
 
 const (
-	//TIME_LAYOUT = "02.01Jan 2, 2006 15:04:05 AM"
 	CUSTOM_KIND  = "Custom"
 )
 
 
 type Custom struct {
-	Key *datastore.Key 		`datastore:"-"`     
-	
+
+	Default 
+
 	Name    string
-	Created time.Time	
 	Project_id *datastore.Key// `datastore:"Project_id,noindex"`
 }
 
 
 
-func (s *Custom) timestamp() string {
-	return s.Created.Format(TIME_LAYOUT)	
+
+
+func NewCustom(name string, project *datastore.Key) (*Custom){
+
+	return &Custom{
+		Name: name,
+		Project_id: project,
+		Default: NewDefault(),
+	}
 }
 
 
-func (s *Custom) put(c appengine.Context) (err error) {
+func (src *Custom) Put(c appengine.Context) (*datastore.Key, error) {
 
-	key := s.Key
-	if key == nil {
-		key = datastore.NewKey(c, CUSTOM_KIND, "", 0,  nil)
-	}
-	key, err = datastore.Put(c, key, s)
-	if err != nil {
-		return err
-	}
-	s.Key = key
-	
-	return nil
-}
-
-
-
-
-
-
-
-
-
-// fetchProjects runs Query q and returns Project entities fetched from the
-// Datastore.
-func FetchCustoms(c appengine.Context, project_id *datastore.Key, limit int) ([]*Custom, error) {
-
-	if limit<= 0 {
-		limit = 10
-	}
-
-	q:= datastore.NewQuery(CUSTOM_KIND).Order("-Created").Limit(limit).Filter("Project_id=", project_id)
-
-	results := make([]*Custom, 0, limit)
-	keys, err := q.GetAll(c, &results)
+	key, err := model.Put(c, src)
 	if err != nil {
 		return nil, err
 	}
 
-	for i, item := range results {
+	src.SetKey(key)
 
-		//c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
-		item.Key = keys[i]
-	}
-
-	return results, nil
+	return key, nil
 }
 
+
+
+
+
+
+func queryCustomByProject(project *datastore.Key) *datastore.Query {
+	return datastore.NewQuery(CUSTOM_KIND).Filter("Project_id =", project).Order("Created")
+}
+
+
+// Datastore.
+func fetchCustoms(c appengine.Context, q *datastore.Query, limit int) ([]*Custom, error) {
+
+	if limit <= 0 {
+		limit = 10
+	}
+
+
+	items := make([]*Custom, 0, limit)
+	keys, err := q.Limit(limit).GetAll(c, &items)
+	if err != nil {
+		return nil, err
+	}
+	for i, item := range items {
+		item.SetKey(keys[i])
+	}
+	return items, nil
+}
 
 
 

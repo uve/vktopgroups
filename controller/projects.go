@@ -16,7 +16,7 @@ type ProjectReqMsg struct {
 type ProjectRespMsg struct {
 	Id      int64  `json:"id"`
 	Name    string `json:"name"`
-	//Created string `json:"created"`
+	Created string `json:"created"`
 	/*Outcome string `json:"outcome"`
 	Played  string `json:"played"`*/
 }
@@ -42,10 +42,12 @@ func (api *ServiceApi) ProjectsCreate(r *http.Request,	req *ProjectReqMsg, resp 
 
 	project := NewProject(req.Name, userId(u))
 	
-	_, err = Put(c, project)
+	_, err = project.Put(c)
 	if err != nil {
 		return err
 	}
+
+	c.Infof("Created id: %v", project.Id())
 
 	project.toMessage(resp)
 
@@ -61,11 +63,11 @@ func (api *ServiceApi) ProjectsList(r *http.Request, req *ProjectsListReq, resp 
 	if err != nil {
 		return err
 	}
-	q := newUserProjectQuery(u)
+	q := queryProjectByUser(u)
 	if req.Limit <= 0 {
 		req.Limit = 10
 	}
-	results, err := fetch(c, q, req.Limit)
+	results, err := fetchProjects(c, q, req.Limit)
 	if err != nil {
 		return err
 	}

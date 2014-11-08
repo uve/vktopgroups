@@ -104,16 +104,20 @@
                 request.execute(function (resp) {
                 
                     this.items = resp.items;  
-
-                    if ( this.items && this.items.length > 0 ) {
-                        this.project_id = this.items[0].id;
-                    }             
-
+                                 
                 }.bind(this));
 
                 
             },
-                  
+
+
+
+            itemsChanged: function(type){
+
+              this.project_id = this.items.choose(type);
+                                   
+            },
+             
 
             openDialog: function(){
 
@@ -125,18 +129,15 @@
 
 
              createProject: function(){
+
                 
                 var new_name = this.$.createProjectName.value;
-
-                console.log("new Project: " + new_name);
 
                 var request = this.api.projects.create({"name": new_name});
                   request.execute(function (resp) {
 
-                    console.log('Project created: '  + new_name);
-
-                    this.getList();
-
+                    this.items.push( resp );
+                   
                   }.bind(this));
            
 

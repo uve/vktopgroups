@@ -133,8 +133,7 @@
 
                   request.execute(function (resp) {
 
-
-                    this.getList();
+                    this.items.push(resp);
 
                   }.bind(this));
 

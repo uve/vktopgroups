@@ -45,7 +45,7 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 	params := Params{
 		ClientId: controller.ClientId,
 		RootUrl: controller.RootUrl,
-		IsDevAppServer : !appengine.IsDevAppServer(),
+		IsDevAppServer : appengine.IsDevAppServer(),
 	}
 		
 

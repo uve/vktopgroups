@@ -1,54 +1,40 @@
 package controller
 
-import "appengine/datastore"
+import (
+
+"appengine"
+"appengine/datastore"
+"appengine/user"
+
+"model"
+)
+
 
 const (
 	PROJECT_KIND  = "Project"
 )
 
 
-
-
-// Project is an entity to store projects that have been inserted by users.
 type Project struct {
 
 	Default
 
-
-
-	key *datastore.Key `datastore:"-"`
-
 	User    string
 	Name    string
-
-	/*Created time.Time*/
 }
 
 
 
 
-func NewProject(name string, user string) (*DefaultInterface){
+func NewProject(name string, user string) (*Project){
 
-	return &DefaultInterface{
+	return &Project{
 		Name: name,
 		User: user,
 		Default: NewDefault(),
 	}
 }
 
-/*
-func (src *Project) put(c appengine.Context) (*datastore.Key, error) {
-
-	key, err := model.Put(c, src)
-	if err != nil{
-		return nil, err
-	}
-
-	src.setKey(key)
-
-	return key, nil
-}
-*/
 
 // Turns the Project struct/entity into a ProjectRespMsg which is then used
 // as an API response.
@@ -58,12 +44,46 @@ func (s *Project) toMessage(msg *ProjectRespMsg) *ProjectRespMsg {
 	if msg == nil {
 		msg = &ProjectRespMsg{}
 	}
-	msg.Id = s.Id()
+	
 	msg.Name = s.Name
-	//msg.Created = s.timestamp()
+
+	msg.Id 		= s.Id()
+	msg.Created = s.GetCreated()
 
 	return msg
 }
+
+
+func (src *Project) Get(c appengine.Context, id int64) (*datastore.Key, error) {
+
+
+	kind := model.GetKind(src)
+
+	key := datastore.NewKey(c, kind, "", id, nil)
+
+	if err := datastore.Get(c, key, src); err != nil {
+		return nil, err
+	}
+
+	src.SetKey(key)
+
+	return key, nil
+}
+
+
+
+func (src *Project) Put(c appengine.Context) (*datastore.Key, error) {
+
+	key, err := model.Put(c, src)
+	if err != nil {
+		return nil, err
+	}
+
+	src.SetKey(key)
+
+	return key, nil
+}
+
 
 
 
@@ -71,23 +91,23 @@ func (s *Project) toMessage(msg *ProjectRespMsg) *ProjectRespMsg {
 
 // newUserProjectQuery returns a Query which can be used to list all previous
 // games of a user.
-func newUserProjectQuery(u *user.User) *datastore.Query {
-	return datastore.NewQuery(PROJECT_KIND).Filter("User =", userId(u)).Order("-Created")
+func queryProjectByUser(u *user.User) *datastore.Query {
+	return datastore.NewQuery(PROJECT_KIND).Filter("User =", userId(u)).Order("Created")
 }
 
-// fetchProjects runs Query q and returns Project entities fetched from the
-// Datastore.
-func fetch(c appengine.Context, q *datastore.Query, limit int) ([]*Project, error) {
 
-	projects := make([]*Project, 0, limit)
-	keys, err := q.Limit(limit).GetAll(c, &projects)
+// Datastore.
+func fetchProjects(c appengine.Context, q *datastore.Query, limit int) ([]*Project, error) {
+
+	items := make([]*Project, 0, limit)
+	keys, err := q.Limit(limit).GetAll(c, &items)
 	if err != nil {
 		return nil, err
 	}
-	for i, project := range projects {
-		project.setKey(keys[i])
+	for i, item := range items {
+		item.SetKey(keys[i])
 	}
-	return projects, nil
+	return items, nil
 }
 
 // userId returns a string ID of the user u to be used as Player of Project.
