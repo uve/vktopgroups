@@ -57,7 +57,7 @@ func (s *Default) setKey(key *datastore.Key) {
 
 
 
-func Put(c appengine.Context, src *DefaultInterface) (*datastore.Key, err error) {
+func Put(c appengine.Context, src *DefaultInterface) (*datastore.Key, error) {
 
 
 	key := src.Key()

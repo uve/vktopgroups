@@ -27,9 +27,9 @@ type Project struct {
 
 
 
-func NewProject(name string, user string) (*Project){
+func NewProject(name string, user string) (*DefaultInterface){
 
-	return &Project{
+	return &DefaultInterface{
 		Name: name,
 		User: user,
 		Default: NewDefault(),
