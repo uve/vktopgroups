@@ -56,10 +56,7 @@ func (s *Project) toMessage(msg *ProjectRespMsg) *ProjectRespMsg {
 
 func (src *Project) Get(c appengine.Context, id int64) (*datastore.Key, error) {
 
-
-	kind := model.GetKind(src)
-
-	key := datastore.NewKey(c, kind, "", id, nil)
+	key := datastore.NewKey(c, model.GetKind(src), "", id, nil)
 
 	if err := datastore.Get(c, key, src); err != nil {
 		return nil, err

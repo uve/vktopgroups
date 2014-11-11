@@ -76,16 +76,6 @@ func GetKind(src interface{}) (string){
 	return kind
 }
 
-/*
-type Service interface {
-  func Key()
-  func SetKey(v)
-}
-
-func Key(p Project) {*datastore.Key, error){
-
-}
-*/
 
 func Put(c appengine.Context, src interface{}) (*datastore.Key, error) {
 
@@ -158,4 +148,6 @@ func GetKey(c appengine.Context, src interface {}, id int64) (*datastore.Key, er
 
 	return key, nil
 }
+
+
 

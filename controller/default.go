@@ -3,10 +3,9 @@ package controller
 import (
 	"time"
 
-	"model"
-	"appengine"
 	"appengine/datastore"
 
+	"errors"
 )
 
 const (
@@ -14,6 +13,8 @@ const (
 	TIME_LAYOUT = "Jan 2, 2006 at 3:04pm (MST)"
 
 )
+
+var CURSOR_COMPLETE = errors.New("datastore: cursor is completed")
 
 
 type Default struct {
@@ -69,6 +70,9 @@ func (s *Default) SetKey(key *datastore.Key) {
 
 
 
+
+
+/*
 func (s *Default) get(c appengine.Context, id int64) (*datastore.Key, error){
 
 	key := datastore.NewKey(c, model.GetKind(s), "", id, nil)
@@ -79,7 +83,7 @@ func (s *Default) get(c appengine.Context, id int64) (*datastore.Key, error){
 
 	return key, nil
 }
-
+*/
 
 
 // timestamp formats date/time of the project.
@@ -96,4 +100,22 @@ func NewDefault() (s Default) {
 // timestamp formats date/time of the project.
 func (s *Default) GetCreated() string {
 	return s.Created.Format(TIME_LAYOUT)	
+}
+
+
+/*
+ * Возвращает новый курсор и сравнивает с входным
+ */
+func GetCursor(t *datastore.Iterator, cursor_start datastore.Cursor) (string, error) {
+
+	cursor_end, err := t.Cursor()
+	if err != nil {
+		return "", err
+	}
+
+	if cursor_start.String() == cursor_end.String(){
+		return "", CURSOR_COMPLETE
+	}
+
+	return cursor_end.String(), nil
 }

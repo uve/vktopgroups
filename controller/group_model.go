@@ -17,6 +17,8 @@ const (
 
 type GroupBase struct {
 
+	Default
+
 	VK_id	       int64  `json:"id"`
 
 	Name 		   string `json:"name"`
@@ -63,7 +65,7 @@ type Group struct {
 
 	Contacts 	   []Contact `datastore:"-" json:"contacts"`
 
-	key 		   *datastore.Key
+	/*key 		   *datastore.Key*/
 
 	Project_id     *datastore.Key// `datastore:"Project_id,noindex"`
 	Custom_id      *datastore.Key// `datastore:"Custom_id,noindex"`
@@ -102,7 +104,7 @@ func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*
 		limit = 10
 	}
 
-	q:= datastore.NewQuery(GROUP_KIND).Order("-Members_count").Limit(limit).Filter("Project_id=", project_id)
+	q:= datastore.NewQuery(GROUP_KIND).Filter("Project_id=", project_id).Order("-Members_count").Limit(limit)
 
 	results := make([]*Group, 0, limit)
 	keys, err := q.GetAll(c, &results)
@@ -112,8 +114,8 @@ func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*
 
 	for i, item := range results {
 
-		//c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
-		item.key = keys[i]
+		c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
+		item.SetKey(keys[i])
 	}
 
 	return results, nil

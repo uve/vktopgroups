@@ -53,6 +53,7 @@ type VK struct{
 	ApiVersion    string
 	Token         string
 	AppId         string
+	Server        string
 }
 
 

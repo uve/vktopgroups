@@ -64,6 +64,7 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 func init() {
 
 	http.HandleFunc("/", handleMainPage)
+	http.HandleFunc("/fetch/contacts", controller.ContactsFetch)
    
 	if _, err := controller.RegisterService(); err != nil {
 		panic(err.Error())

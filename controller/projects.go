@@ -63,10 +63,12 @@ func (api *ServiceApi) ProjectsList(r *http.Request, req *ProjectsListReq, resp 
 	if err != nil {
 		return err
 	}
+
 	q := queryProjectByUser(u)
 	if req.Limit <= 0 {
 		req.Limit = 10
 	}
+
 	results, err := fetchProjects(c, q, req.Limit)
 	if err != nil {
 		return err

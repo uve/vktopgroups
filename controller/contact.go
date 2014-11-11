@@ -2,69 +2,42 @@ package controller
 
 import (
 	"net/http"
-	"net/url"
-
-	"fmt"
-
-	"appengine/urlfetch"
-	"appengine/taskqueue"
-
 	"github.com/crhym3/go-endpoints/endpoints"
 
-	"encoding/json"
 
+	"appengine"
 
-	"model"
-
-)
-
-
-const (
-
-	GROUPS_LIMIT=3	
-	MAX_LIMIT=5000
-
+	"appengine/taskqueue"
+	"net/url"
 )
 
 
 
-type GroupsListReq struct {
-	Limit 	   int    `json:"limit"`
-	Project_id int64  `json:"project_id,string" endpoints:'required'`
-}
+func ContactsFetch(w http.ResponseWriter, r *http.Request) {
 
+	c := appengine.NewContext(r)
 
+	cursor := r.FormValue("cursor")
+	c.Infof("Cursor: %v",  cursor)
 
-type GroupsListResp struct {
+	results, err := fetchContacts(c, cursor)
 
-	Items []*GroupJson `json:"items"`
-}
+	if err != nil {
+		c.Infof("Error: %v",  err)
+		return
+	}
 
+	v := url.Values{}
+	v.Add("cursor", results)
 
-
-
-type GroupsFetchReq struct {
-	Limit 	   int    `json:"limit"`
-	Custom_id  int64  `json:"custom_id,string" endpoints:'required'`
-
-}
-
-type GroupsFetchResp struct {
+	task := taskqueue.NewPOSTTask("/fetch/contacts", v)
+	_, err = taskqueue.Add(c, task, "")
 
 }
 
 
 
-type Message struct {
-
-	Response []Group `json:"response"`
-}
-
-
-
-
-
-func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *GroupsListResp) error {
+func (api *ServiceApi) ContactsList(r *http.Request, req *GroupsListReq, resp *GroupsListResp) error {
 
 	c := endpoints.NewContext(r)
 
@@ -88,14 +61,17 @@ func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *Gro
 	return nil
 }
 
-
-
+/*
 
 // GroupsList queries scontrollers for the current user.
 // Exposed as API endpoint
 func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results *GroupsFetchResp) error {
 
 	c := endpoints.NewContext(r)
+
+
+	server := "https://api.vk.com/method"
+
 
 	var custom Custom
 
@@ -123,7 +99,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	v.Add("v", VK.ApiVersion)
 	v.Add("q", custom.Name)
 
-	api_url := fmt.Sprintf("%s/%s?%s", VK.Server, method, v.Encode())
+	api_url := fmt.Sprintf("%s/%s?%s", server, method, v.Encode())
 
 
 	client := urlfetch.Client(c)
@@ -136,6 +112,8 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 	err = model.DeleteAll(c, Group{})
 	err = model.DeleteAll(c, Contact{})
+
+
 
 
 	var m Message
@@ -175,7 +153,6 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 		group.Custom_id = custom_id;
 		group.Project_id = Project_id;		
 
-
 		group.City_id    = group.City.Id
 		group.City_title = group.City.Title
 
@@ -210,7 +187,6 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 			item.Default = NewDefault()
-			item.Is_exist = false
 
 			item.Group_id   = group_keys[i]
 			item.Project_id = value.Project_id
@@ -231,13 +207,10 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 	c.Infof("new contacts: %v", len(new_contacts))
 
-	task := taskqueue.NewPOSTTask("/fetch/contacts", url.Values{})
-	_, err = taskqueue.Add(c, task, "")
-
 	return nil
 }
 
-
+*/
 
 
 

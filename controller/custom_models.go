@@ -79,15 +79,16 @@ func fetchCustoms(c appengine.Context, q *datastore.Query, limit int) ([]*Custom
 
 
 
-func (s *Custom) Get(c appengine.Context, id int64) (*datastore.Key, error){
 
-	c.Infof("################### id:  %v", id)
+func (src *Custom) Get(c appengine.Context, id int64) (*datastore.Key, error) {
 
-	key := datastore.NewKey(c, "Custom", "", id, nil)
+	key := datastore.NewKey(c, model.GetKind(src), "", id, nil)
 
-	if err := datastore.Get(c, key, s); err != nil {
-		return nil,  err
+	if err := datastore.Get(c, key, src); err != nil {
+		return nil, err
 	}
+
+	src.SetKey(key)
 
 	return key, nil
 }

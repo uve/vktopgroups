@@ -17,7 +17,6 @@ indexes:
   - name: Created
     direction: asc
 
-
 - kind: Custom
   properties:
   - name: Project_id
@@ -28,10 +27,4 @@ indexes:
   properties:
   - name: Project_id
   - name: Members_count
-    direction: asc
-
-- kind: User
-  properties:
-  - name: Id
-  - name: Created
-    direction: asc
+    direction: desc
