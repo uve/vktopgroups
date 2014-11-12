@@ -9,6 +9,10 @@ import (
 
 	"config"
 
+	"os"
+	"fmt"
+	"encoding/json"
+	"strings"
 )
 
 
@@ -19,85 +23,20 @@ var (
 	audiences = []string{ClientId}
 
 
-
 	VK = config.Config.VK
 
 	ClientId = config.Config.OAuthProviders.Google.ClientID
 	RootUrl  = config.Config.RootUrl
-
-
 )
 
-
-
-type BoardMsg struct {
-	State string `json:"state" endpoints:"required"`
-}
-
+const config_api  = "config/config_api.json"
 
 
 // Mindale API service
 type ServiceApi struct {
 }
 
-/*
-// BoardGetMove simulates a computer move in mindale.
-// Exposed as API endpoint
-func (api *ServiceApi) BoardGetMove(r *http.Request,
-	req *BoardMsg, resp *BoardMsg) error {
 
-	const boardLen = 9
-	if len(req.State) != boardLen {
-		return fmt.Errorf("Bad Request: Invalid board: %q", req.State)
-	}
-	runes := []rune(req.State)
-	freeIndices := make([]int, 0)
-	for pos, r := range runes {
-		if r != 'O' && r != 'X' && r != '-' {
-			return fmt.Errorf("Bad Request: Invalid rune: %q", r)
-		}
-		if r == '-' {
-			freeIndices = append(freeIndices, pos)
-		}
-	}
-	freeIdxLen := len(freeIndices)
-	if freeIdxLen > 0 {
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		randomIdx := r.Intn(freeIdxLen)
-		runes[freeIndices[randomIdx]] = 'O'
-		resp.State = string(runes)
-	} else {
-		return fmt.Errorf("Bad Request: This board is full: %q", req.State)
-	}
-	return nil
-}
-
-// ProjectsList queries scontrollers for the current user.
-// Exposed as API endpoint
-func (api *ServiceApi) ProjectsList(r *http.Request,
-	req *ProjectsListReq, resp *ProjectsListResp) error {
-
-	c := endpoints.NewContext(r)
-	u, err := getCurrentUser(c)
-	if err != nil {
-		return err
-	}
-	q := newUserProjectQuery(u)
-	if req.Limit <= 0 {
-		req.Limit = 10
-	}
-	scontrollers, err := fetchProjects(c, q, req.Limit)
-	if err != nil {
-		return err
-	}
-	resp.Items = make([]*ProjectRespMsg, len(scontrollers))
-	for i, scontroller := range scontrollers {
-		resp.Items[i] = scontroller.toMessage(nil)
-	}
-	return nil
-}
-
-*/
 
 
 // getCurrentUser retrieves a user associated with the request.
@@ -120,29 +59,13 @@ func GetCurrentUser(c endpoints.Context) (*user.User, error) {
 }
 
 
-func createMethod(rpcService *endpoints.RpcService, service, path, method, name string){
 
-	info := rpcService.MethodByName(name).Info()
-	info.Path, info.HttpMethod, info.Name = path, method, name
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+type Service struct{
+	Method     string
+	Name       string
+	Path       string
+	HttpMethod string
 }
-
-/*
-type Entity interface {
-
-	UnmarshalHTTP(*http.Request) error
-}
-
-func GetEntity(r *http.Request, v Entity) error {
-	return v.UnmarshalHTTP(r)
-}
-
-func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *GroupsListResp) error {
-
-}
-*/
-
-
 
 // RegisterService exposes ServiceApi methods as API endpoints.
 // 
@@ -157,65 +80,28 @@ func RegisterService() (*endpoints.RpcService, error) {
 		return nil, err
 	}
 
+	configFile, err := os.Open(config_api)
+	if err != nil {
+		panic(fmt.Sprintf("Could not open %s: %s", config_api, err))
+	}
+	defer configFile.Close()
 
 
+	config := make([]Service,0)
 
-	info := rpcService.MethodByName("ProjectsList").Info()
-	info.Path, info.HttpMethod, info.Name = "projects/list", "GET", "projects.list"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+	if err = json.NewDecoder(configFile).Decode(&config); err != nil {
+		panic(fmt.Sprintf("Could not parse %s: %s", config_api, err))
+	}
 
+	for _, item := range config{
 
-	info = rpcService.MethodByName("ProjectsCreate").Info()
-	info.Path, info.HttpMethod, info.Name = "projects/create", "POST", "projects.create"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+		info := rpcService.MethodByName(item.Method).Info()
+		info.Path = item.Path
+		info.Name = strings.Replace(item.Path, "/", ".", -1)
+		info.HttpMethod = item.HttpMethod
+		info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+	}
 
-
-	info = rpcService.MethodByName("CustomsList").Info()
-	info.Path, info.HttpMethod, info.Name = "params/custom/list", "GET", "params.custom.list"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-	info = rpcService.MethodByName("CustomsCreate").Info()
-	info.Path, info.HttpMethod, info.Name = "params/custom/create", "POST", "params.custom.create"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-
-
-	info = rpcService.MethodByName("GroupsList").Info()
-	info.Path, info.HttpMethod, info.Name = "groups/list", "GET", "groups.list"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-
-	info = rpcService.MethodByName("GroupsFetch").Info()
-	info.Path, info.HttpMethod, info.Name = "groups/fetch", "POST", "groups.fetch"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-
-/*
-	info = rpcService.MethodByName("ProjectsInsert").Info()
-	info.Path, info.HttpMethod, info.Name = "scontrollers", "POST", "projects.insert"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-	
-	info := rpcService.MethodByName("PaymentsAdd").Info()
-	info.Path, info.HttpMethod, info.Name = "payments", "GET", "payments.add"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-
-
-
-	info = rpcService.MethodByName("BoardGetMove").Info()
-	info.Path, info.HttpMethod, info.Name = "board", "POST", "board.getmove"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-	info = rpcService.MethodByName("ProjectsList").Info()
-	info.Path, info.HttpMethod, info.Name = "scontrollers", "GET", "scontrollers.list"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-	info = rpcService.MethodByName("ProjectsInsert").Info()
-	info.Path, info.HttpMethod, info.Name = "scontrollers", "POST", "scontrollers.insert"
-	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
-
-*/
 	return rpcService, nil
 }
 

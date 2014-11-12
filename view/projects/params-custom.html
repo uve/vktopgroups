@@ -47,7 +47,8 @@
                 <core-icon icon="search"></core-icon>{{name}}
                 
 
-                <paper-button value="{{id}}" on-tap="{{search}}">обновить с vk.com</paper-button>
+                <!-- <paper-button value="{{id}}" on-tap="{{search}}">обновить с vk.com</paper-button> -->
+                <paper-button value="{{id}}" on-tap="{{delete}}">удалить</paper-button>
 
             </div>
 
@@ -58,7 +59,6 @@
         <paper-button class="colored" on-tap={{openDialog}}>Создать поиск</paper-button>
 
 
-
           <paper-dialog id="createDialog" heading="Create new Query" transition="paper-dialog-transition-center">
             
 
@@ -67,10 +67,6 @@
             <paper-button on-tap={{create}} affirmative autofocus>Создать</paper-button>
 
           </paper-dialog>
-
-
-
-
 
 
 
@@ -137,7 +133,6 @@
 
                   }.bind(this));
 
-
               },
 
 
@@ -151,6 +146,24 @@
                      "limit": 3
 
                  }).then(function (resp) {
+
+                 }.bind(this),
+                 function (err) {
+
+                 });
+
+             },
+
+             delete: function (e) {
+
+                 var custom_id = e.target.getAttribute('value');
+
+                 this.api.params.custom.delete({
+                     "custom_id": custom_id
+
+                 }).then(function (resp) {
+
+                             this.items.removeById(custom_id);
 
                  }.bind(this),
                  function (err) {

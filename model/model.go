@@ -1,12 +1,11 @@
 package model
 
 import (
-	"appengine"
-	"appengine/datastore"
-
 	"reflect"
 	"strings"
 
+	"appengine"
+	"appengine/datastore"
 	"errors"
 )
 
@@ -29,15 +28,23 @@ func getStructName(any interface{}) (string){
 }
 
 
-
-func DeleteAll(c appengine.Context, any interface{}) (error) {
+/*
+func DeleteByModel(c appengine.Context, any interface{}) (error) {
 
 	kind := getStructName(any)
 		
 	c.Infof("Delete all: %v", kind)
 
-	q:= datastore.NewQuery(kind).KeysOnly()
+	q := datastore.NewQuery(kind)
 
+	return DeleteByQuery(c, q)
+}
+*/
+
+
+func DeleteByQuery(c appengine.Context, query *datastore.Query) (error) {
+
+	q := query.KeysOnly()
 
 	results := make([]reflect.Value, 0, QUERY_MAX)
 	keys, err := q.GetAll(c, &results)
@@ -45,14 +52,14 @@ func DeleteAll(c appengine.Context, any interface{}) (error) {
 		return err
 	}
 
-
 	err = datastore.DeleteMulti(c, keys)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
+
 
 
 

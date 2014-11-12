@@ -28,3 +28,15 @@ indexes:
   - name: Project_id
   - name: Members_count
     direction: desc
+
+- kind: Group
+  properties:
+  - name: Custom_id
+  - name: Members_count
+    direction: desc
+
+- kind: Contact
+  properties:
+  - name: Custom_id
+  - name: Created
+    direction: asc

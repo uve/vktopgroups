@@ -1,0 +1,45 @@
+[
+
+	{
+	  "Method": "ProjectsList",
+	  "Path":   "projects/list",
+	  "HttpMethod": "GET",
+	  "Desc": "Get list of projects"
+	},
+	{
+	  "Method": "ProjectsCreate",
+	  "Path":   "projects/create",
+	  "HttpMethod": "POST",
+	  "Desc": "Create the New Project"
+	},
+
+
+	{
+	  "Method": "GroupsList",
+	  "Path":   "groups/list",
+	  "HttpMethod": "GET",
+	  "Desc": "Get list of groups"
+	},
+
+
+
+	{
+	  "Method": "CustomsList",
+	  "Path":   "params/custom/list",
+	  "HttpMethod": "GET",
+	  "Desc": "Get list of customs"
+	},
+	{
+	  "Method": "CustomsCreate",
+	  "Path":   "params/custom/create",
+	  "HttpMethod": "POST",
+	  "Desc": "Create custom parameter for search"
+	},
+	{
+	  "Method": "CustomsDelete",
+	  "Path":   "params/custom/delete",
+	  "HttpMethod": "POST"
+	}
+
+
+]

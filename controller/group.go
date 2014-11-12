@@ -13,16 +13,14 @@ import (
 
 	"encoding/json"
 
-
 	"model"
-
+	"strconv"
 )
 
 
 const (
 
-	GROUPS_LIMIT=3	
-	MAX_LIMIT=5000
+	GROUPS_LIMIT = 10
 
 )
 
@@ -90,16 +88,24 @@ func (api *ServiceApi) GroupsList(r *http.Request, req *GroupsListReq, resp *Gro
 
 
 
-
-// GroupsList queries scontrollers for the current user.
-// Exposed as API endpoint
-func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results *GroupsFetchResp) error {
+func GroupsFetch(w http.ResponseWriter, r *http.Request) {
 
 	c := endpoints.NewContext(r)
 
+	c.Infof("Fetch groups")
+
+	form_custom_id_str := r.FormValue("custom_id")
+	form_custom_id, err := strconv.ParseInt(form_custom_id_str, 10, 64)
+
+	limit := strconv.FormatInt(GROUPS_LIMIT, 10)
+
+	if err != nil{
+		panic(err)
+	}
+
 	var custom Custom
 
-	custom_id, _ := custom.Get(c, req.Custom_id)
+	custom_id, _ := custom.Get(c, form_custom_id)
 
 
 	Project_id := custom.Project_id
@@ -107,14 +113,14 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	c.Infof("Custom_id: %v",  custom_id)
 	c.Infof("Project_id: %v", Project_id)
 
-	c.Infof("Seach id: %v",    req.Custom_id)
+	c.Infof("Seach id: %v",    form_custom_id)
 	c.Infof("Seach query: %v", custom.Name)
 
+	c.Infof("Seach query: %v", custom.Name)
+	c.Infof("Find Group Limit: %v",  GROUPS_LIMIT)
+
+
 	method := "execute.scan_groups"
-
-
-	limit := fmt.Sprintf("%d", req.Limit);
-
 
 	v := url.Values{}
 	v.Set("access_token", VK.Token)
@@ -129,13 +135,13 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	client := urlfetch.Client(c)
 	resp, err := client.Get(api_url)
 	if err != nil {
-		//http.Error(w, err.Error(), http.StatusInternalServerError)
-		return err
+		panic(err)
 	}
 
-
-	err = model.DeleteAll(c, Group{})
-	err = model.DeleteAll(c, Contact{})
+	/*
+	err = model.DeleteByModel(c, Group{})
+	err = model.DeleteByModel(c, Contact{})
+	*/
 
 
 	var m Message
@@ -146,9 +152,9 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 
-	all_groups, err := fetchGroups(c, Project_id, MAX_LIMIT)
+	all_groups, err := fetchGroups(c, Project_id, QUERY_MAX)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	new_groups := []Group{}
@@ -192,9 +198,8 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 	group_keys, err := model.PutMulti(c, new_groups);
-
 	if err != nil {
-		panic(fmt.Sprintf("Could put to database : %s", err))
+		panic(err)
 	}
 
 	new_contacts := []Contact{}
@@ -223,9 +228,7 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 
 
 	if _, err := model.PutMulti(c, new_contacts); err != nil {
-
-		c.Infof("error: %v", err)
-		return err
+		panic(err)
 	}
 
 
@@ -234,7 +237,6 @@ func (api *ServiceApi) GroupsFetch(r *http.Request, req *GroupsFetchReq, results
 	task := taskqueue.NewPOSTTask("/fetch/contacts", url.Values{})
 	_, err = taskqueue.Add(c, task, "")
 
-	return nil
 }
 
 

@@ -6,6 +6,8 @@ import (
 	"appengine/datastore"
 
 	"errors"
+
+	"model"
 )
 
 const (
@@ -16,6 +18,8 @@ const (
 
 var CURSOR_COMPLETE = errors.New("datastore: cursor is completed")
 
+
+var QUERY_MAX = model.QUERY_MAX
 
 type Default struct {
 
@@ -119,3 +123,4 @@ func GetCursor(t *datastore.Iterator, cursor_start datastore.Cursor) (string, er
 
 	return cursor_end.String(), nil
 }
+

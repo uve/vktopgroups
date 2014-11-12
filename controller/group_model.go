@@ -100,21 +100,15 @@ func (s *Group) toMessage(msg *GroupJson) *GroupJson {
 
 func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*Group, error) {
 
-	if limit <= 0 {
-		limit = 10
-	}
-
 	q:= datastore.NewQuery(GROUP_KIND).Filter("Project_id=", project_id).Order("-Members_count").Limit(limit)
 
-	results := make([]*Group, 0, limit)
+	results := make([]*Group, 0, QUERY_MAX)
 	keys, err := q.GetAll(c, &results)
 	if err != nil {
 		return nil, err
 	}
 
 	for i, item := range results {
-
-		c.Infof("Key:  %v : is_equal: %v", item.Project_id, project_id.Equal(item.Project_id))
 		item.SetKey(keys[i])
 	}
 
@@ -122,5 +116,7 @@ func fetchGroups(c appengine.Context, project_id *datastore.Key, limit int) ([]*
 }
 
 
+func queryGroupsByCustom(c appengine.Context, custom_id *datastore.Key) (*datastore.Query){
 
-
+	return datastore.NewQuery(GROUP_KIND).Filter("Custom_id=", custom_id).Order("-Members_count")
+}

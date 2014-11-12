@@ -16,7 +16,7 @@ import (
 const (
 	CONTACT_KIND   = "Contact"
 	CONTACT_CURSOR = CONTACT_KIND + "_cursor"
-	CONTACTS_LIMIT = 3
+	CONTACTS_LIMIT = 100
 
 )
 
@@ -63,11 +63,7 @@ type ContactMessage struct {
 
 func fetchContacts(c appengine.Context, cursor_start string) (string, error) {
 
-	/*
-	if limit <= 0 {
-		limit = 10
-	}*/
-	limit := 4
+	limit := CONTACTS_LIMIT
 
 	q:= datastore.NewQuery(CONTACT_KIND).Filter("Is_exist=", false).Limit(limit)
 
@@ -97,7 +93,7 @@ func fetchContacts(c appengine.Context, cursor_start string) (string, error) {
 
 		ids = append(ids, p.User_id)
 
-		all_keys = append(all_keys, key)
+		all_keys  = append(all_keys, key)
 		all_items = append(all_items, p)
 	}
 
@@ -166,3 +162,9 @@ func saveContacts(c appengine.Context, list []int64) (*[]ContactBase, error) {
 	return &m.Response, nil
 }
 
+
+
+func queryContactsByCustom(c appengine.Context, custom_id *datastore.Key) (*datastore.Query){
+
+	return datastore.NewQuery(CONTACT_KIND).Filter("Custom_id=", custom_id).Order("Created")
+}

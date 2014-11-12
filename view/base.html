@@ -93,14 +93,27 @@
 Array.prototype.choose = function(type) {
 
     if (!this || this.length < 1){
-      return false;
+        return false;
     }
 
     if (type && type[0] && type[0].addedCount > 0){
-        return this[this.length - 1].id; 
+        return this[this.length - 1].id;
     }
 
     return this[0].id;
+}
+
+Array.prototype.removeById = function(id) {
+
+    if (!this || this.length < 1){
+        return false;
+    }
+
+    for (var i = 0; i < this.length; i++) {
+        if (this[i].id == id) {
+            this.splice(i, 1);
+        }
+    }
 }
 
 

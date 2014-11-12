@@ -65,6 +65,7 @@ func init() {
 
 	http.HandleFunc("/", handleMainPage)
 	http.HandleFunc("/fetch/contacts", controller.ContactsFetch)
+	http.HandleFunc("/fetch/groups", controller.GroupsFetch)
    
 	if _, err := controller.RegisterService(); err != nil {
 		panic(err.Error())

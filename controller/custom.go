@@ -9,6 +9,12 @@ import (
 	//"time"
 
 	"github.com/crhym3/go-endpoints/endpoints"
+
+	"model"
+	"appengine/datastore"
+	"appengine/taskqueue"
+	"net/url"
+	"strconv"
 	
 )
 
@@ -39,6 +45,16 @@ type ListResponseCustoms struct {
 
 
 
+type CustomsDeleteReq struct {
+	Custom_id int64 `json:"custom_id,string" endpoints:'required'`
+}
+
+type CustomsDeleteResp struct {
+	Success bool `json:"success"`
+}
+
+
+
 
 func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, resp *ResponseMsgCustom) error {
 
@@ -60,6 +76,17 @@ func (api *ServiceApi) CustomsCreate(r *http.Request, req *RequestMsgCustom, res
 
 	item.toMessage(resp)
 
+	c.Infof("Custom Created: %v", item)
+	custom_id := strconv.FormatInt(item.Id(), 10)
+	c.Infof("Id: %v", custom_id)
+
+
+	v := url.Values{}
+	v.Add("custom_id", custom_id)
+
+	task := taskqueue.NewPOSTTask("/fetch/groups", v)
+	_, err = taskqueue.Add(c, task, "")
+
 	return nil
 }
 
@@ -77,7 +104,6 @@ func (s *Custom) toMessage(msg *ResponseMsgCustom) *ResponseMsgCustom {
 
 	return msg
 }
-
 
 
 
@@ -115,9 +141,62 @@ func (api *ServiceApi) CustomsList(r *http.Request, req *ListRequestCustoms, res
 		c.Infof("%v",item)
 		
 	}
-	
 
 	return nil
 }
+
+
+
+func (api *ServiceApi) CustomsDelete(r *http.Request, req *CustomsDeleteReq, resp *CustomsDeleteResp) error {
+
+	c := endpoints.NewContext(r)
+
+	resp = &CustomsDeleteResp{}
+	resp.Success = true
+
+
+	var item Custom
+
+	key, err := item.Get(c, req.Custom_id)
+	if err != nil {
+		c.Errorf("Error: %v", err)
+		resp.Success = false
+		return err
+	}
+
+	c.Infof("Removing custom: %v", item.Name)
+
+
+	q := queryGroupsByCustom(c, key)
+
+	err = model.DeleteByQuery(c, q)
+	if err != nil{
+		c.Errorf("Can't delete Groups by Custom_id: %v", err)
+		resp.Success = false
+		return err
+	}
+
+	q = queryContactsByCustom(c, key)
+
+	err = model.DeleteByQuery(c, q)
+	if err != nil{
+		c.Errorf("Can't delete Groups by Custom_id: %v", err)
+		resp.Success = false
+		return err
+	}
+
+
+
+
+	err = datastore.Delete(c, key)
+	if err != nil {
+		resp.Success = false
+	}
+
+
+	return nil
+
+}
+
 
 
