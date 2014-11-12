@@ -90,7 +90,7 @@ func (s *Group) toMessage(msg *GroupJson) *GroupJson {
 	}
 	msg.Id = s.key.IntID()
 	msg.Name = s.Name
-	msg.Members_count = s.Members_count
+	msg.GroupBase = s.GroupBase
 
 	return msg
 }

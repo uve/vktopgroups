@@ -26,7 +26,7 @@ type Default struct {
 	key *datastore.Key `datastore:"-"`
 
 
-	Created time.Time
+	Created time.Time `json:"created"`
 }
 
 
@@ -45,14 +45,6 @@ type DefaultInterface interface {
 func (s *Default) Key() *datastore.Key {
 	return s.key
 }
-
-
-/*
-func (src *Default) GetKey(c appengine.Context, id int64) (*datastore.Key, error) {
-
-	return model.GetKey(c, src, id)
-}
-*/
 
 
 
